@@ -47,19 +47,28 @@ This guide will help you deploy your AI Book Marketing Agent so you can start ma
    - Click "New +" → "Web Service"
    - Connect your GitHub repository
    - Select the repository: `ai-book-agent`
-   - Root Directory: `backend`
-   - Environment: `Python 3`
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `python main.py`
+   - **Root Directory**: `backend`
+   - **Environment**: `Python 3`
+   - **Python Version**: 3.11.7 (specified in runtime.txt)
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `python main.py`
 4. **Environment Variables**:
    ```
    OPENAI_API_KEY=your-openai-key
    GOOGLE_APPLICATION_CREDENTIALS=./credentials.json
    PORT=10000
+   FLASK_ENV=production
    ```
 5. **Upload Firebase Credentials**:
    - Upload your Firebase JSON file as `credentials.json` in the backend directory
    - Or add the entire JSON content as an environment variable
+
+**🔧 Backend Troubleshooting:**
+- ✅ **Python 3.11.7**: Uses stable version with better package compatibility
+- ✅ **Updated Dependencies**: All packages compatible with Python 3.11+
+- ❌ **Build Fails**: Check build logs for specific dependency errors
+- 🔍 **Port Issues**: Render automatically uses PORT environment variable
+- 🔄 **Redeploy**: After adding environment variables, trigger new deployment
 
 ### Step 3: Connect Frontend to Backend
 
