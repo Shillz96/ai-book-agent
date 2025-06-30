@@ -16,10 +16,11 @@ import { initializeApp } from 'firebase/app';
 // Firebase Auth imports for authentication handling
 import { 
   getAuth, 
-  signInAnonymously, 
+  connectAuthEmulator, 
   signInWithCustomToken, 
-  onAuthStateChanged, 
-  signOut 
+  onAuthStateChanged,
+  signInAnonymously
+  // signOut - removed as it's not currently used
 } from 'firebase/auth';
 
 // Firebase Firestore imports for database operations
