@@ -18,33 +18,55 @@ This guide will help you deploy your AI Book Marketing Agent so you can start ma
 2. **Sign up** with your GitHub account
 3. **Import your project**:
    - Click "New Project"
-   - Import from the `frontend/` directory
-   - Build Command: `npm run build`
-   - Output Directory: `build`
-4. **Deploy**: Your dashboard will be live at `https://your-app.vercel.app`
+   - Import from GitHub repository: `ai-book-agent`
+   - **Root Directory**: `frontend`
+   - **Framework Preset**: `Create React App`
+   - **Build Command**: `npm run build` (or leave default)
+   - **Output Directory**: `build`
+4. **Environment Variables** (Settings → Environment Variables):
+   ```
+   CI=false
+   REACT_APP_FIREBASE_API_KEY=your-firebase-api-key
+   REACT_APP_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   REACT_APP_FIREBASE_PROJECT_ID=your-project-id
+   REACT_APP_API_URL=https://your-backend.onrender.com/api
+   ```
+5. **Deploy**: Your dashboard will be live at `https://your-app.vercel.app`
 
-### Step 2: Deploy Backend (Railway - Free Tier)
+**🔧 Build Troubleshooting:**
+- ✅ **Warnings are OK**: Build succeeds with ESLint warnings (this is normal)
+- ❌ **If build fails**: Set `CI=false` in Vercel environment variables
+- 🔍 **Check logs**: View detailed build logs in Vercel dashboard
+- 🔄 **Redeploy**: Click "Redeploy" after adding environment variables
 
-1. **Go to**: [railway.app](https://railway.app)
-2. **Sign up** and create new project
-3. **Deploy from GitHub**:
-   - Connect your repository
-   - Select the `backend/` directory
-   - Railway will auto-detect Python and install dependencies
+### Step 2: Deploy Backend (Render - Free Tier)
+
+1. **Go to**: [render.com](https://render.com)
+2. **Sign up** and connect your GitHub account
+3. **Create new Web Service**:
+   - Click "New +" → "Web Service"
+   - Connect your GitHub repository
+   - Select the repository: `ai-book-agent`
+   - Root Directory: `backend`
+   - Environment: `Python 3`
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `python main.py`
 4. **Environment Variables**:
    ```
    OPENAI_API_KEY=your-openai-key
    GOOGLE_APPLICATION_CREDENTIALS=./credentials.json
+   PORT=10000
    ```
 5. **Upload Firebase Credentials**:
-   - Upload your Firebase JSON file as `credentials.json`
+   - Upload your Firebase JSON file as `credentials.json` in the backend directory
+   - Or add the entire JSON content as an environment variable
 
 ### Step 3: Connect Frontend to Backend
 
 1. **Update API URL** in frontend:
    - Edit `frontend/src/App.js`
-   - Change `API_BASE_URL` to your Railway URL
-   - Example: `https://your-backend.railway.app/api`
+   - Change `API_BASE_URL` to your Render URL
+   - Example: `https://your-backend.onrender.com/api`
 
 ## 🏠 **OPTION 2: Local Development Setup**
 
@@ -150,7 +172,7 @@ After deployment, you'll need to configure your API keys. The app includes a com
 
 ### Platform Costs (Optional Upgrades)
 - **Twitter Pro**: $100/month for unlimited posting
-- **Hosting**: Free (Vercel + Railway free tiers)
+- **Hosting**: Free (Vercel + Render free tiers)
 
 ### Total Monthly Investment
 - **Minimum**: $530/month ($30 AI + $500 marketing)
@@ -187,7 +209,7 @@ After deployment, you'll need to configure your API keys. The app includes a com
 ## ⚡ **Quick Start Checklist**
 
 - [ ] Deploy frontend to Vercel
-- [ ] Deploy backend to Railway
+- [ ] Deploy backend to Render
 - [ ] Complete onboarding guide
 - [ ] Add all API keys in Settings
 - [ ] Configure book information
