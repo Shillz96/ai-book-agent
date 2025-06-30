@@ -1,0 +1,78 @@
+/* Import Inter font from Google Fonts for consistent typography */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom base styles */
+@layer base {
+  /* Ensure full height for html and body */
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Smooth scrolling for better UX */
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  /* Base font settings with Inter as primary font */
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Code elements styling */
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+      monospace;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  /* Loading spinner animation */
+  .loading-spinner {
+    @apply animate-spin rounded-full border-b-2 border-blue-500;
+  }
+  
+  /* Modal backdrop */
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+  }
+  
+  /* Card component base with responsive padding */
+  .card {
+    @apply bg-white rounded-lg shadow p-4 sm:p-6;
+  }
+  
+  /* Responsive button styles */
+  .btn-responsive {
+    @apply px-3 py-2 text-sm sm:px-4 sm:py-2 sm:text-base;
+  }
+}
+
+/* Custom utilities */
+@layer utilities {
+  /* Text truncation with ellipsis */
+  .text-truncate {
+    @apply truncate;
+  }
+  
+  /* Enhanced focus states for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-opacity-75;
+  }
+  
+  /* Responsive spacing utilities */
+  .spacing-responsive {
+    @apply space-y-2 sm:space-y-3 lg:space-y-4;
+  }
+} 
