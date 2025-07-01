@@ -132,6 +132,60 @@ const Settings = ({
   };
 
   /**
+   * Test configuration by validating API connections
+   */
+  const testConfiguration = async () => {
+    if (!userId) {
+      setSaveMessage('❌ User not authenticated');
+      return;
+    }
+
+    setLoading(true);
+    setSaveMessage('🧪 Testing configuration...');
+
+    try {
+      const response = await fetch(`http://localhost:5000/api/config/${userId}/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          config: settings
+        })
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to validate configuration');
+      }
+
+      const validationResults = result.validation_results;
+      
+      // Format results for display
+      let message = '📋 Configuration Test Results:\n\n';
+      Object.entries(validationResults).forEach(([service, result]) => {
+        const emoji = result.status === 'success' ? '✅' : 
+                     result.status === 'error' ? '❌' : 
+                     result.status === 'skipped' ? '⏭️' : '⚠️';
+        message += `${emoji} ${service}: ${result.message}\n`;
+      });
+
+      setSaveMessage(message);
+      
+      // Clear message after 10 seconds (longer for test results)
+      setTimeout(() => setSaveMessage(''), 10000);
+      
+    } catch (error) {
+      console.error('Error testing configuration:', error);
+      setSaveMessage('❌ Error testing configuration: ' + error.message);
+      setTimeout(() => setSaveMessage(''), 5000);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
    * Save settings to Firebase and update backend
    */
   const saveSettings = async () => {
@@ -144,6 +198,7 @@ const Settings = ({
     setSaveMessage('');
 
     try {
+      // Save to Firebase (for immediate UI updates)
       const { setDoc, doc, serverTimestamp } = await import('firebase/firestore');
       const settingsRef = doc(firebaseServices.db, 'settings', userId);
       
@@ -154,12 +209,41 @@ const Settings = ({
 
       await setDoc(settingsRef, settingsToSave);
       
+      // Also save to backend config API for dynamic loading
+      try {
+        const response = await fetch(`http://localhost:5000/api/config/${userId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            config: settings,
+            app_id: window.__app_id || 'default-app-id'
+          })
+        });
+
+        const result = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(result.error || 'Failed to save configuration to backend');
+        }
+
+        console.log('Configuration saved to backend:', result);
+      } catch (backendError) {
+        console.error('Error saving to backend config API:', backendError);
+        // Don't fail the entire save operation, just log the error
+        setSaveMessage('⚠️ Settings saved to Firebase but backend config update failed. Some features may not work correctly.');
+      }
+      
       // Call callback to notify parent component
       if (onSettingsUpdate) {
         onSettingsUpdate(settingsToSave);
       }
 
-      setSaveMessage('✅ Settings saved successfully!');
+      // If we get here without backend errors, show success message
+      if (saveMessage === '') {
+        setSaveMessage('✅ Settings saved successfully! Backend configuration updated.');
+      }
       
       // Clear message after 3 seconds
       setTimeout(() => setSaveMessage(''), 3000);
@@ -806,13 +890,13 @@ const Settings = ({
           </div>
         </div>
 
-        {/* Footer with Save Button */}
+        {/* Footer with Test and Save Buttons */}
         <div className="bg-gray-50 px-6 py-4 flex justify-between items-center">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 max-w-md">
             {saveMessage && (
-              <span className={saveMessage.includes('✅') ? 'text-green-600' : 'text-red-600'}>
+              <div className={`whitespace-pre-line ${saveMessage.includes('✅') ? 'text-green-600' : saveMessage.includes('❌') ? 'text-red-600' : 'text-blue-600'}`}>
                 {saveMessage}
-              </span>
+              </div>
             )}
           </div>
           
@@ -822,6 +906,13 @@ const Settings = ({
               className="px-4 py-2 text-gray-600 hover:text-gray-800"
             >
               Cancel
+            </button>
+            <button
+              onClick={testConfiguration}
+              disabled={loading}
+              className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Testing...' : 'Test Configuration'}
             </button>
             <button
               onClick={saveSettings}

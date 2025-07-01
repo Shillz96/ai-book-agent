@@ -2,6 +2,7 @@
 from . import compat
 compat.ensure_compatibility()
 
+import os
 import firebase_admin
 from firebase_admin import credentials, firestore
 from datetime import datetime
@@ -17,31 +18,55 @@ class FirebaseService:
     Manages user settings, posts, and other data storage.
     """
     
-    def __init__(self, credentials_path: str, project_id: str):
-        """
-        Initialize Firebase service with credentials.
-        
-        Args:
-            credentials_path: Path to Firebase service account credentials JSON
-            project_id: Firebase project ID
-        """
+    _instance = None
+    _initialized = False
+
+    def __new__(cls):
+        """Create a singleton instance of the Firebase service."""
+        if cls._instance is None:
+            cls._instance = super(FirebaseService, cls).__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        """Initialize the Firebase service."""
+        if not self._initialized:
+            self._initialize_firebase()
+            FirebaseService._initialized = True
+
+    def _initialize_firebase(self):
+        """Initialize Firebase with credentials."""
         try:
-            # Initialize Firebase Admin SDK if not already initialized
-            if not firebase_admin._apps:
-                cred = credentials.Certificate(credentials_path)
-                firebase_admin.initialize_app(cred, {
-                    'projectId': project_id
+            # For testing, use emulator if available
+            if os.getenv('FIRESTORE_EMULATOR_HOST'):
+                os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = 'localhost:9099'
+                cred = credentials.Certificate({
+                    'type': 'service_account',
+                    'project_id': 'test-project',
+                    'private_key_id': 'test-key-id',
+                    'private_key': '-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----\n',
+                    'client_email': 'test@test-project.iam.gserviceaccount.com',
+                    'client_id': 'test-client-id',
+                    'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
+                    'token_uri': 'https://oauth2.googleapis.com/token',
+                    'auth_provider_x509_cert_url': 'https://www.googleapis.com/oauth2/v1/certs',
+                    'client_x509_cert_url': 'https://www.googleapis.com/robot/v1/metadata/x509/test'
                 })
-                logger.info("Firebase Admin SDK initialized successfully")
-            
-            # Get Firestore client
+            else:
+                # In production, use service account credentials
+                cred = credentials.Certificate(
+                    os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+                )
+
+            firebase_admin.initialize_app(cred)
             self.db = firestore.client()
-            self.project_id = project_id
-            
         except Exception as e:
-            logger.error(f"Failed to initialize Firebase: {str(e)}")
-            raise
-    
+            raise Exception(f"Error initializing Firebase: {str(e)}")
+
+    @property
+    def initialized(self):
+        """Check if Firebase is initialized."""
+        return self._initialized
+
     def get_user_settings(self, app_id: str, user_id: str) -> Optional[Dict[str, Any]]:
         """
         Retrieve user settings from Firestore.

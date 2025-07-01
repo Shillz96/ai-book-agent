@@ -1,0 +1,52 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+        
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        
+    - name: Install and build frontend
+      run: |
+        cd frontend
+        npm install
+        npm run build
+        
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Create deployment package
+      run: |
+        zip -r deploy.zip . -x "*.git*" "node_modules/*" "venv/*"
+        
+    # Add your deployment steps here based on your hosting provider
+    # Example for AWS Elastic Beanstalk:
+    # - name: Deploy to AWS Elastic Beanstalk
+    #   uses: einaregilsson/beanstalk-deploy@v21
+    #   with:
+    #     aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     application_name: "ai-book-agent"
+    #     environment_name: "production"
+    #     version_label: ${{ github.sha }}
+    #     region: "us-east-1"
+    #     deployment_package: deploy.zip 

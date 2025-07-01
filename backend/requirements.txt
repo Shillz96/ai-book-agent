@@ -24,7 +24,7 @@ python-dateutil==2.8.2
 
 # Google Analytics & Ads Integration
 google-analytics-data==0.18.4
-google-ads==23.0.0
+google-ads==27.0.0
 google-auth==2.25.2
 google-auth-oauthlib==1.2.0
 

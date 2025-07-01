@@ -582,7 +582,44 @@ class AutonomousMarketingManager:
         return []
     
     async def _schedule_posts(self, posts: List[Dict]) -> List[Dict]:
-        return []
+        """Schedule (and immediately publish) social posts concurrently.
+
+        This uses ``asyncio.gather`` to fire off all network-bound posting
+        calls at once via the *async-capable* social media manager, ensuring
+        we don't waste time waiting for each platform's HTTP round-trip in
+        sequence.  Behaviour is unchanged – every requested post is still
+        attempted once – but overall latency is ~max(api latency) instead of
+        sum(latencies).
+
+        Args:
+            posts: list of dictionaries produced by ``_generate_daily_posts``.
+                   Each dict must contain at least ``platform`` and
+                   ``content`` keys, plus optional ``media_urls`` or
+                   ``title``.
+
+        Returns:
+            A list of result dictionaries – one per post – mirroring the
+            structure returned by ``SocialMediaManager.post_content``.
+        """
+
+        if not posts:
+            return []
+
+        async def _dispatch(post: Dict) -> Dict:
+            try:
+                return await self.social_media_manager.post_content(
+                    post.get("platform", ""),
+                    post.get("content", ""),
+                    post.get("media_urls"),
+                    title=post.get("title", ""),
+                )
+            except Exception as exc:
+                logger.error(
+                    f"Error posting to {post.get('platform')}: {str(exc)}")
+                return {"success": False, "error": str(exc), **post}
+
+        # Kick off all posts concurrently.
+        return await asyncio.gather(*[_dispatch(p) for p in posts])
     
     async def _get_active_campaigns(self) -> List[str]:
         return []

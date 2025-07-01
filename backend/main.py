@@ -3,36 +3,50 @@ from flask_cors import CORS
 import logging
 import os
 import asyncio
+import sys
+import traceback
 from datetime import datetime
 
-# Import our custom services
-from config.settings import Config
-from app.firebase_service import FirebaseService
-from app.content_generator import ContentGenerator
-from app.social_media_manager import SocialMediaManager
-from app.revenue_growth_manager import RevenueGrowthManager
-from app.performance_analytics import PerformanceAnalytics
-from app.google_analytics_service import GoogleAnalyticsService
-from app.google_ads_service import GoogleAdsService
-from app.autonomous_manager import AutonomousMarketingManager
-from app.budget_manager import BudgetManager
-from app.scheduler_service import SchedulerService
-
-# Configure logging
+# Configure logging with more detailed format
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.DEBUG,  # Changed to DEBUG for more detailed logs
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    stream=sys.stdout  # Explicitly write to stdout
 )
 logger = logging.getLogger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__)
-app.config.from_object(Config)
 
-# Enable CORS for frontend communication
-CORS(app, origins=["http://localhost:3000", "https://your-frontend-domain.com"])
+try:
+    # Load configuration
+    from config.settings import Config
+    app.config.from_object(Config)
+    logger.info("Successfully loaded configuration")
+    
+    # Enable CORS for frontend communication
+    CORS(app, origins=["http://localhost:3000", "https://your-frontend-domain.com"])
+    logger.info("CORS enabled")
+    
+    # Import our custom services
+    from app.firebase_service import FirebaseService
+    from app.content_generator import ContentGenerator
+    from app.social_media_manager import SocialMediaManager
+    from app.async_social_media_manager import AsyncSocialMediaManager
+    from app.revenue_growth_manager import RevenueGrowthManager
+    from app.performance_analytics import PerformanceAnalytics
+    from app.google_analytics_service import GoogleAnalyticsService
+    from app.google_ads_service import GoogleAdsService
+    from app.autonomous_manager import AutonomousMarketingManager
+    from app.budget_manager import BudgetManager
+    from app.scheduler_service import SchedulerService
+    logger.info("Successfully imported all required modules")
+except Exception as e:
+    logger.error(f"Startup error: {str(e)}")
+    logger.error(f"Traceback: {traceback.format_exc()}")
+    sys.exit(1)
 
-# Global service instances (initialized on startup)
+# Global service instances
 firebase_service = None
 content_generator = None
 social_media_manager = None
@@ -45,9 +59,7 @@ budget_manager = None
 scheduler_service = None
 
 def initialize_services():
-    """
-    Initialize all backend services with proper error handling and integration.
-    """
+    """Initialize all backend services with proper error handling and integration."""
     global firebase_service, content_generator, social_media_manager
     global revenue_growth_manager, performance_analytics, google_analytics_service
     global google_ads_service, autonomous_manager, budget_manager, scheduler_service
@@ -57,6 +69,9 @@ def initialize_services():
         missing_configs = Config.validate_config()
         if missing_configs:
             logger.warning(f"Missing configuration: {', '.join(missing_configs)}")
+            return
+        
+        logger.info("Starting service initialization...")
         
         # Initialize Firebase service
         if Config.FIREBASE_PROJECT_ID and os.path.exists(Config.FIREBASE_CREDENTIALS_PATH):
@@ -66,7 +81,7 @@ def initialize_services():
             )
             logger.info("Firebase service initialized successfully")
         else:
-            logger.error("Firebase configuration missing or credentials file not found")
+            logger.warning("Firebase configuration missing or credentials file not found")
         
         # Initialize Content Generator
         if Config.OPENAI_API_KEY:
@@ -76,12 +91,12 @@ def initialize_services():
             )
             logger.info("Content generator initialized successfully")
         else:
-            logger.error("OpenAI API key not configured")
+            logger.warning("OpenAI API key not configured")
         
-        # Initialize Social Media Manager
+        # Initialize Social Media Manager (async-capable wrapper)
         social_config = Config.get_social_media_config()
-        social_media_manager = SocialMediaManager(social_config)
-        logger.info("Social media manager initialized successfully")
+        social_media_manager = AsyncSocialMediaManager(social_config)
+        logger.info("Async social media manager initialized successfully")
         
         # Initialize Google Analytics Service
         google_services_config = Config.get_google_services_config()
@@ -165,14 +180,16 @@ def initialize_services():
             except Exception as e:
                 logger.error(f"Error starting autonomous operations: {str(e)}")
         
+        logger.info("Service initialization completed")
+        
     except Exception as e:
         logger.error(f"Error initializing services: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        raise
 
 @app.route("/")
 def hello_world():
-    """
-    Basic health check endpoint with comprehensive service status.
-    """
+    """Basic health check endpoint with comprehensive service status."""
     return jsonify({
         "message": "AI Book Marketing Agent Backend is running!",
         "timestamp": datetime.now().isoformat(),
@@ -1078,26 +1095,23 @@ def not_found(error):
 def internal_error(error):
     return jsonify({"error": "Internal server error"}), 500
 
-# Initialize services when the app starts
-with app.app_context():
-    initialize_services()
-
-if __name__ == '__main__':
-    # Print startup information
-    print("=" * 50)
-    print("AI Book Marketing Agent Backend")
-    print("=" * 50)
-    print(f"OpenAI API configured: {bool(Config.OPENAI_API_KEY)}")
-    print(f"Firebase configured: {bool(Config.FIREBASE_PROJECT_ID)}")
-    print(f"Debug mode: {Config.DEBUG}")
-    print("=" * 50)
-    
-    # Get port from environment (for deployment) or default to 5000 (for local dev)
-    port = int(os.environ.get('PORT', 5000))
-    
-    # Run the Flask app
-    app.run(
-        debug=Config.DEBUG,
-        host='0.0.0.0',
-        port=port
-    )
+if __name__ == "__main__":
+    try:
+        # Initialize all services
+        initialize_services()
+        
+        # Print startup information
+        logger.info("=" * 50)
+        logger.info("AI Book Marketing Agent Backend")
+        logger.info("=" * 50)
+        logger.info(f"OpenAI API configured: {bool(Config.OPENAI_API_KEY)}")
+        logger.info(f"Firebase configured: {bool(Config.FIREBASE_PROJECT_ID)}")
+        logger.info(f"Debug mode: {Config.DEBUG}")
+        logger.info("=" * 50)
+        
+        # Run the Flask application
+        app.run(host="0.0.0.0", port=5000, debug=Config.DEBUG)
+    except Exception as e:
+        logger.error(f"Failed to start application: {str(e)}")
+        logger.error(f"Traceback: {traceback.format_exc()}")
+        sys.exit(1)
