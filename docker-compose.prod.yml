@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  # Redis for task queue and caching
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Main AI Book Marketing Agent Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      # Production environment settings
+      - FLASK_DEBUG=false
+      - SECRET_KEY=${SECRET_KEY}
+      - REDIS_URL=redis://redis:6379/0
+      
+      # OpenAI Configuration (required)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4}
+      
+      # Firebase Configuration (required)
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_CREDENTIALS_PATH=/app/config/firebase-credentials.json
+      
+      # Social Media APIs (optional)
+      - TWITTER_API_KEY=${TWITTER_API_KEY}
+      - TWITTER_API_SECRET=${TWITTER_API_SECRET}
+      - TWITTER_ACCESS_TOKEN=${TWITTER_ACCESS_TOKEN}
+      - TWITTER_ACCESS_TOKEN_SECRET=${TWITTER_ACCESS_TOKEN_SECRET}
+      - FACEBOOK_ACCESS_TOKEN=${FACEBOOK_ACCESS_TOKEN}
+      - FACEBOOK_PAGE_ID=${FACEBOOK_PAGE_ID}
+      - INSTAGRAM_ACCESS_TOKEN=${INSTAGRAM_ACCESS_TOKEN}
+      - INSTAGRAM_BUSINESS_ACCOUNT_ID=${INSTAGRAM_BUSINESS_ACCOUNT_ID}
+      - PINTEREST_ACCESS_TOKEN=${PINTEREST_ACCESS_TOKEN}
+      - PINTEREST_BOARD_ID=${PINTEREST_BOARD_ID}
+      
+      # Google Services (optional)
+      - GOOGLE_ANALYTICS_PROPERTY_ID=${GOOGLE_ANALYTICS_PROPERTY_ID}
+      - GOOGLE_ANALYTICS_CREDENTIALS_PATH=/app/config/google-analytics-credentials.json
+      - GOOGLE_ADS_CUSTOMER_ID=${GOOGLE_ADS_CUSTOMER_ID}
+      - GOOGLE_ADS_DEVELOPER_TOKEN=${GOOGLE_ADS_DEVELOPER_TOKEN}
+      - GOOGLE_ADS_CREDENTIALS_PATH=/app/config/google-ads-credentials.json
+      
+      # Budget Management
+      - MONTHLY_MARKETING_BUDGET=${MONTHLY_MARKETING_BUDGET:-500.0}
+      - BUDGET_ALERT_THRESHOLD=${BUDGET_ALERT_THRESHOLD:-0.8}
+      - EMERGENCY_STOP_THRESHOLD=${EMERGENCY_STOP_THRESHOLD:-0.95}
+      - AUTO_BUDGET_REALLOCATION=${AUTO_BUDGET_REALLOCATION:-true}
+      
+      # Autonomous Operation
+      - AUTONOMOUS_MODE=${AUTONOMOUS_MODE:-false}
+      - DAILY_POST_SCHEDULE=${DAILY_POST_SCHEDULE:-9:00,14:00,19:00}
+      - WEEKLY_REPORT_DAY=${WEEKLY_REPORT_DAY:-monday}
+      - WEEKLY_REPORT_TIME=${WEEKLY_REPORT_TIME:-09:00}
+      - AUTO_OPTIMIZATION_ENABLED=${AUTO_OPTIMIZATION_ENABLED:-true}
+      - MIN_CONFIDENCE_THRESHOLD=${MIN_CONFIDENCE_THRESHOLD:-0.7}
+      
+      # Book Information
+      - BOOK_TITLE=${BOOK_TITLE:-Unstoppable - the young athlete's guide to rock solid mental strength}
+      - BOOK_AMAZON_URL=${BOOK_AMAZON_URL}
+      - BOOK_AUDIBLE_URL=${BOOK_AUDIBLE_URL}
+      - LANDING_PAGE_URL=${LANDING_PAGE_URL}
+      
+      # Target Audience
+      - PRIMARY_AUDIENCE=${PRIMARY_AUDIENCE:-youth athletes, parents, coaches}
+      - TARGET_AGE_RANGE=${TARGET_AGE_RANGE:-13-25}
+      - GEOGRAPHIC_TARGETS=${GEOGRAPHIC_TARGETS:-US,CA,UK,AU}
+      
+      # Performance Thresholds
+      - MIN_ENGAGEMENT_RATE=${MIN_ENGAGEMENT_RATE:-0.02}
+      - MIN_CTR=${MIN_CTR:-0.01}
+      - TARGET_ROAS=${TARGET_ROAS:-3.0}
+      - MIN_CONVERSION_RATE=${MIN_CONVERSION_RATE:-0.005}
+      
+    volumes:
+      # Mount credential files
+      - ./backend/config/firebase-credentials.json:/app/config/firebase-credentials.json:ro
+      - ./backend/config/google-analytics-credentials.json:/app/config/google-analytics-credentials.json:ro
+      - ./backend/config/google-ads-credentials.json:/app/config/google-ads-credentials.json:ro
+    
+    depends_on:
+      redis:
+        condition: service_healthy
+    
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:5000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Nginx reverse proxy (optional, for SSL and load balancing)
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      app:
+        condition: service_healthy
+    profiles:
+      - nginx
+
+volumes:
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    driver: bridge 

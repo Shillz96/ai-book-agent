@@ -22,9 +22,7 @@ python-dotenv==1.1.1
 # Utility dependencies
 python-dateutil==2.9.0
 
-# Google Analytics & Ads Integration
-google-analytics-data==0.18.4
-google-ads==27.0.0
+# Google Auth (required for Firebase)
 google-auth==2.40.3
 google-auth-oauthlib==1.2.0
 
@@ -33,15 +31,12 @@ celery==5.3.4
 redis==5.0.1
 APScheduler==3.10.4
 
-# Advanced analytics and optimization - using newer compatible versions
+# Advanced analytics and optimization - core packages only
 pandas==2.3.0
 scikit-learn==1.5.2
-scipy==1.14.1
 
 # Performance monitoring and rate limiting
 ratelimit==2.2.1
-aiohttp==3.9.5
-asyncio-throttle==1.0.2
 
 # Testing dependencies
 pytest==8.4.1
