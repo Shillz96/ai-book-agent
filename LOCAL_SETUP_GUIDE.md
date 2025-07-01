@@ -4,6 +4,8 @@
 
 This guide will help you get the AI Book Marketing Agent running on your local computer in just a few simple steps. **No .env file editing required** - all configuration is done through the web interface!
 
+**✅ NEW: All dependencies are now included!** No manual package installations needed.
+
 ## 📋 Prerequisites
 
 Before starting, make sure you have these installed on your computer:
@@ -64,7 +66,7 @@ cd ai-book-agent
 # Go to frontend folder
 cd frontend
 
-# Install Node.js packages
+# Install Node.js packages (all dependencies included - Firebase, Axios, React)
 npm install
 
 # Start the frontend development server
@@ -72,6 +74,12 @@ npm start
 ```
 
 Your web browser should automatically open to `http://localhost:3000`
+
+**✅ All Required Dependencies Included:**
+- Firebase SDK for real-time data and authentication
+- Axios for API communication with backend
+- React and all UI dependencies
+- Testing frameworks and development tools
 
 ## ⚙️ Configuration Through Web Interface
 
