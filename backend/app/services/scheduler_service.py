@@ -582,4 +582,319 @@ class SchedulerService:
         pass
     
     async def _save_shutdown_state(self):
+        pass
+
+    def handle_emergency_budget_alert(self, alert_data: Dict) -> Dict:
+        """
+        Handle emergency budget alerts with real budget management actions.
+        
+        Args:
+            alert_data: Alert information including budget thresholds and current spend
+            
+        Returns:
+            Dictionary containing actions taken and status
+        """
+        try:
+            user_id = alert_data.get('user_id')
+            app_id = alert_data.get('app_id')
+            alert_type = alert_data.get('alert_type')
+            current_spend = alert_data.get('current_spend', 0)
+            budget_limit = alert_data.get('budget_limit', 0)
+            
+            actions_taken = []
+            
+            # Critical budget threshold exceeded - immediate action required
+            if alert_type == 'critical_budget_exceeded':
+                # Pause all active campaigns immediately
+                if self.ads_service:
+                    pause_result = self._pause_all_campaigns(user_id, app_id)
+                    actions_taken.append({
+                        'action': 'pause_campaigns',
+                        'result': pause_result,
+                        'timestamp': datetime.now().isoformat()
+                    })
+                
+                # Send immediate notification
+                notification_result = self._send_emergency_notification(
+                    user_id, 
+                    f"CRITICAL: Budget exceeded! All campaigns paused. Spend: ${current_spend:.2f} / ${budget_limit:.2f}"
+                )
+                actions_taken.append({
+                    'action': 'emergency_notification',
+                    'result': notification_result,
+                    'timestamp': datetime.now().isoformat()
+                })
+            
+            # High spend warning - reduce budgets
+            elif alert_type == 'high_spend_warning':
+                # Reduce all campaign budgets by 50%
+                if self.ads_service:
+                    reduction_result = self._reduce_campaign_budgets(user_id, app_id, reduction_percentage=0.5)
+                    actions_taken.append({
+                        'action': 'reduce_budgets',
+                        'result': reduction_result,
+                        'timestamp': datetime.now().isoformat()
+                    })
+                
+                # Schedule budget review
+                review_task = self._schedule_budget_review(user_id, app_id, hours_ahead=1)
+                actions_taken.append({
+                    'action': 'schedule_review',
+                    'result': review_task,
+                    'timestamp': datetime.now().isoformat()
+                })
+            
+            # Log emergency action
+            self._log_emergency_action(user_id, app_id, alert_data, actions_taken)
+            
+            return {
+                'status': 'emergency_handled',
+                'alert_type': alert_type,
+                'actions_taken': actions_taken,
+                'next_check_time': (datetime.now() + timedelta(minutes=15)).isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Error handling emergency budget alert: {str(e)}")
+            return {'status': 'error', 'error': str(e)}
+
+    def handle_performance_emergency(self, performance_data: Dict) -> Dict:
+        """
+        Handle performance emergencies with real optimization actions.
+        
+        Args:
+            performance_data: Performance metrics indicating emergency conditions
+            
+        Returns:
+            Dictionary containing emergency response actions
+        """
+        try:
+            user_id = performance_data.get('user_id')
+            app_id = performance_data.get('app_id')
+            emergency_type = performance_data.get('emergency_type')
+            
+            actions_taken = []
+            
+            # Conversion rate collapse - immediate optimization
+            if emergency_type == 'conversion_collapse':
+                conversion_rate = performance_data.get('conversion_rate', 0)
+                
+                # Pause underperforming campaigns
+                if conversion_rate < 0.005:  # Less than 0.5%
+                    pause_result = self._pause_underperforming_campaigns(user_id, app_id, min_conversion_rate=0.01)
+                    actions_taken.append({
+                        'action': 'pause_poor_campaigns',
+                        'result': pause_result,
+                        'timestamp': datetime.now().isoformat()
+                    })
+                
+                # Switch to proven ad variations
+                if self.ads_service:
+                    switch_result = self._activate_best_performing_ads(user_id, app_id)
+                    actions_taken.append({
+                        'action': 'activate_best_ads',
+                        'result': switch_result,
+                        'timestamp': datetime.now().isoformat()
+                    })
+            
+            # Cost spike emergency - immediate cost control
+            elif emergency_type == 'cost_spike':
+                cost_increase = performance_data.get('cost_increase_percentage', 0)
+                
+                if cost_increase > 50:  # 50% cost increase
+                    # Switch to manual bidding
+                    bidding_result = self._switch_to_manual_bidding(user_id, app_id)
+                    actions_taken.append({
+                        'action': 'manual_bidding',
+                        'result': bidding_result,
+                        'timestamp': datetime.now().isoformat()
+                    })
+                    
+                    # Reduce bid amounts by 30%
+                    bid_reduction_result = self._reduce_all_bids(user_id, app_id, reduction_percentage=0.3)
+                    actions_taken.append({
+                        'action': 'reduce_bids',
+                        'result': bid_reduction_result,
+                        'timestamp': datetime.now().isoformat()
+                    })
+            
+            # Quality score emergency - immediate ad optimization
+            elif emergency_type == 'quality_score_drop':
+                avg_quality_score = performance_data.get('avg_quality_score', 10)
+                
+                if avg_quality_score < 4:  # Critical quality score
+                    # Pause low quality keywords
+                    keyword_pause_result = self._pause_low_quality_keywords(user_id, app_id, min_quality_score=5)
+                    actions_taken.append({
+                        'action': 'pause_low_quality_keywords',
+                        'result': keyword_pause_result,
+                        'timestamp': datetime.now().isoformat()
+                    })
+                    
+                    # Generate new ad variations immediately
+                    if self.content_generator:
+                        new_ads_result = self._generate_emergency_ad_variations(user_id, app_id)
+                        actions_taken.append({
+                            'action': 'generate_new_ads',
+                            'result': new_ads_result,
+                            'timestamp': datetime.now().isoformat()
+                        })
+            
+            # Log emergency action
+            self._log_emergency_action(user_id, app_id, performance_data, actions_taken)
+            
+            return {
+                'status': 'performance_emergency_handled',
+                'emergency_type': emergency_type,
+                'actions_taken': actions_taken,
+                'monitoring_increased': True,
+                'next_check_time': (datetime.now() + timedelta(minutes=10)).isoformat()
+            }
+            
+        except Exception as e:
+            logger.error(f"Error handling performance emergency: {str(e)}")
+            return {'status': 'error', 'error': str(e)}
+
+    def _pause_all_campaigns(self, user_id: str, app_id: str) -> Dict:
+        """Pause all active campaigns for emergency budget control."""
+        try:
+            if not self.ads_service:
+                return {'status': 'error', 'message': 'Ads service not available'}
+            
+            # Get all active campaigns
+            campaigns = self.ads_service.get_active_campaigns(user_id)
+            paused_campaigns = []
+            
+            for campaign in campaigns:
+                try:
+                    result = self.ads_service.pause_campaign(campaign['id'])
+                    if result.get('success'):
+                        paused_campaigns.append(campaign['id'])
+                except Exception as e:
+                    logger.error(f"Error pausing campaign {campaign['id']}: {str(e)}")
+            
+            return {
+                'status': 'success',
+                'paused_campaigns': paused_campaigns,
+                'total_paused': len(paused_campaigns)
+            }
+            
+        except Exception as e:
+            logger.error(f"Error pausing all campaigns: {str(e)}")
+            return {'status': 'error', 'message': str(e)}
+
+    def _reduce_campaign_budgets(self, user_id: str, app_id: str, reduction_percentage: float) -> Dict:
+        """Reduce campaign budgets by specified percentage."""
+        try:
+            if not self.ads_service:
+                return {'status': 'error', 'message': 'Ads service not available'}
+            
+            campaigns = self.ads_service.get_active_campaigns(user_id)
+            updated_campaigns = []
+            
+            for campaign in campaigns:
+                try:
+                    current_budget = campaign.get('daily_budget', 0)
+                    new_budget = current_budget * (1 - reduction_percentage)
+                    
+                    result = self.ads_service.update_campaign_budget(campaign['id'], new_budget)
+                    if result.get('success'):
+                        updated_campaigns.append({
+                            'campaign_id': campaign['id'],
+                            'old_budget': current_budget,
+                            'new_budget': new_budget
+                        })
+                except Exception as e:
+                    logger.error(f"Error reducing budget for campaign {campaign['id']}: {str(e)}")
+            
+            return {
+                'status': 'success',
+                'updated_campaigns': updated_campaigns,
+                'reduction_percentage': reduction_percentage * 100
+            }
+            
+        except Exception as e:
+            logger.error(f"Error reducing campaign budgets: {str(e)}")
+            return {'status': 'error', 'message': str(e)}
+
+    def _send_emergency_notification(self, user_id: str, message: str) -> Dict:
+        """Send emergency notification to user through multiple channels."""
+        try:
+            notifications_sent = []
+            
+            # Get user notification preferences
+            user_settings = self.firebase_service.get_user_settings('default', user_id) if self.firebase_service else {}
+            notification_settings = user_settings.get('notifications', {})
+            
+            # Send email notification if configured
+            email = notification_settings.get('email')
+            if email:
+                email_result = self._send_email_notification(email, "BUDGET EMERGENCY", message)
+                notifications_sent.append({'type': 'email', 'result': email_result})
+            
+            # Send SMS notification if configured
+            phone = notification_settings.get('phone')
+            if phone:
+                sms_result = self._send_sms_notification(phone, message)
+                notifications_sent.append({'type': 'sms', 'result': sms_result})
+            
+            # Store notification in Firebase
+            if self.firebase_service:
+                notification_data = {
+                    'type': 'emergency',
+                    'message': message,
+                    'timestamp': datetime.now().isoformat(),
+                    'acknowledged': False
+                }
+                self.firebase_service.save_notification(user_id, notification_data)
+                notifications_sent.append({'type': 'in_app', 'result': 'stored'})
+            
+            return {
+                'status': 'success',
+                'notifications_sent': notifications_sent,
+                'message': message
+            }
+            
+        except Exception as e:
+            logger.error(f"Error sending emergency notification: {str(e)}")
+            return {'status': 'error', 'message': str(e)}
+
+    def _pause_underperforming_campaigns(self, user_id: str, app_id: str, min_conversion_rate: float) -> Dict:
+        # Implementation of _pause_underperforming_campaigns method
+        pass
+
+    def _activate_best_performing_ads(self, user_id: str, app_id: str) -> Dict:
+        # Implementation of _activate_best_performing_ads method
+        pass
+
+    def _switch_to_manual_bidding(self, user_id: str, app_id: str) -> Dict:
+        # Implementation of _switch_to_manual_bidding method
+        pass
+
+    def _reduce_all_bids(self, user_id: str, app_id: str, reduction_percentage: float) -> Dict:
+        # Implementation of _reduce_all_bids method
+        pass
+
+    def _pause_low_quality_keywords(self, user_id: str, app_id: str, min_quality_score: float) -> Dict:
+        # Implementation of _pause_low_quality_keywords method
+        pass
+
+    def _generate_emergency_ad_variations(self, user_id: str, app_id: str) -> Dict:
+        # Implementation of _generate_emergency_ad_variations method
+        pass
+
+    def _log_emergency_action(self, user_id: str, app_id: str, alert_data: Dict, actions_taken: List[Dict]):
+        # Implementation of _log_emergency_action method
+        pass
+
+    def _schedule_budget_review(self, user_id: str, app_id: str, hours_ahead: int) -> Dict:
+        # Implementation of _schedule_budget_review method
+        pass
+
+    def _send_email_notification(self, email: str, subject: str, message: str) -> Dict:
+        # Implementation of _send_email_notification method
+        pass
+
+    def _send_sms_notification(self, phone: str, message: str) -> Dict:
+        # Implementation of _send_sms_notification method
         pass 

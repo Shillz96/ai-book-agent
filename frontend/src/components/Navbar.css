@@ -1,0 +1,29 @@
+/* Navbar styling – utilises the CSS custom properties defined in src/index.css */
+
+.navbar-root {
+  background-color: var(--dark-moss-green);
+  color: var(--on-primary);
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-lg);
+  position: sticky;
+  top: 0;
+  z-index: 50; /* stay above the rest of the content */
+}
+
+.navbar-brand {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 640px) {
+  .navbar-root {
+    padding: var(--space-3) var(--space-4);
+  }
+  .navbar-brand {
+    font-size: var(--text-lg);
+  }
+} 

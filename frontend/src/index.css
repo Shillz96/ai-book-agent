@@ -75,4 +75,22 @@
   .spacing-responsive {
     @apply space-y-2 sm:space-y-3 lg:space-y-4;
   }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Maintain a pleasant light theme even in OS dark-mode so our earthy palette remains consistent */
+    --background: var(--cornsilk);
+    --surface: #ffffff;
+    --surface-dim: #f8f4e9;
+    --surface-elevated: #ffffff;
+    --on-background: var(--pakistan-green);
+    --on-surface: var(--pakistan-green);
+    --text-primary: var(--pakistan-green);
+    --text-secondary: #4a5233;
+    --text-tertiary: #6b7355;
+    --border: #d4d0c4;
+    --border-light: #e8e6dd;
+    --divider: #e0ddd2;
+  }
 } 

@@ -528,547 +528,361 @@ gtag('event', 'conversion', {{
             return {'error': str(e), 'setup_complete': False}
     
     def _get_campaign_performance(self, campaign_id: str) -> Dict:
-        """Get current campaign performance metrics."""
+        """
+        Get real-time campaign performance data from Google Ads API.
+        
+        Args:
+            campaign_id: Google Ads campaign ID
+            
+        Returns:
+            Dictionary containing actual campaign performance metrics
+        """
         try:
-            # Query for campaign performance metrics
+            # Build query for campaign performance
             query = f"""
-                SELECT
+                SELECT 
                     campaign.id,
                     campaign.name,
+                    campaign.status,
                     metrics.impressions,
                     metrics.clicks,
-                    metrics.ctr,
-                    metrics.average_cpc,
                     metrics.cost_micros,
                     metrics.conversions,
-                    metrics.conversion_rate,
+                    metrics.conversions_value,
+                    metrics.ctr,
+                    metrics.average_cpc,
                     metrics.cost_per_conversion
-                FROM campaign
+                FROM campaign 
                 WHERE campaign.id = {campaign_id}
                 AND segments.date DURING LAST_30_DAYS
             """
             
-            # In a real implementation, this would query the Google Ads API
-            # For now, return realistic sample data
-            performance_data = {
+            # Execute query using Google Ads API
+            ga_service = self.client.get_service("GoogleAdsService")
+            search_request = self.client.get_type("SearchGoogleAdsRequest")
+            search_request.customer_id = self.customer_id
+            search_request.query = query
+            
+            response = ga_service.search(request=search_request)
+            
+            # Process results
+            total_impressions = 0
+            total_clicks = 0
+            total_cost = 0
+            total_conversions = 0
+            total_conversion_value = 0
+            
+            for row in response:
+                total_impressions += row.metrics.impressions
+                total_clicks += row.metrics.clicks
+                total_cost += row.metrics.cost_micros / 1_000_000  # Convert from micros
+                total_conversions += row.metrics.conversions
+                total_conversion_value += row.metrics.conversions_value
+            
+            # Calculate derived metrics
+            ctr = (total_clicks / total_impressions * 100) if total_impressions > 0 else 0
+            avg_cpc = (total_cost / total_clicks) if total_clicks > 0 else 0
+            cost_per_conversion = (total_cost / total_conversions) if total_conversions > 0 else 0
+            roi = ((total_conversion_value - total_cost) / total_cost * 100) if total_cost > 0 else 0
+            
+            return {
                 'campaign_id': campaign_id,
-                'impressions': 15420,
-                'clicks': 1236,
-                'ctr': 0.0802,  # 8.02%
-                'average_cpc': 1.85,
-                'total_cost': 2286.60,
-                'conversions': 47,
-                'conversion_rate': 0.038,  # 3.8%
-                'cost_per_conversion': 48.65,
-                'quality_score_avg': 7.2,
-                'search_impression_share': 0.74,
-                'period': 'last_30_days',
+                'impressions': total_impressions,
+                'clicks': total_clicks,
+                'cost': total_cost,
+                'conversions': total_conversions,
+                'conversion_value': total_conversion_value,
+                'ctr': round(ctr, 2),
+                'avg_cpc': round(avg_cpc, 2),
+                'cost_per_conversion': round(cost_per_conversion, 2),
+                'roi': round(roi, 2),
+                'data_freshness': 'real_time',
                 'last_updated': datetime.now().isoformat()
             }
             
-            # Calculate derived metrics
-            performance_data['roi'] = (performance_data['conversions'] * 25.0) / performance_data['total_cost']  # Assuming $25 per book
-            performance_data['roas'] = performance_data['roi']
-            
-            logger.info(f"Retrieved performance data for campaign {campaign_id}")
-            return performance_data
-            
+        except GoogleAdsException as ex:
+            logger.error(f"Google Ads API error getting campaign performance: {ex}")
+            return {'error': f'Google Ads API error: {ex.error.message}'}
         except Exception as e:
             logger.error(f"Error getting campaign performance: {str(e)}")
             return {'error': str(e)}
     
     def _analyze_keyword_performance(self, campaign_id: str) -> Dict:
-        """Analyze keyword performance and identify optimization opportunities."""
-        try:
-            # Sample keyword performance data with realistic metrics
-            keyword_data = [
-                {
-                    'keyword': 'mental toughness book',
-                    'match_type': 'EXACT',
-                    'impressions': 2450,
-                    'clicks': 185,
-                    'ctr': 0.075,
-                    'average_cpc': 2.15,
-                    'cost': 397.75,
-                    'conversions': 8,
-                    'conversion_rate': 0.043,
-                    'quality_score': 8,
-                    'status': 'high_performing'
-                },
-                {
-                    'keyword': 'sports psychology',
-                    'match_type': 'PHRASE',
-                    'impressions': 3820,
-                    'clicks': 245,
-                    'ctr': 0.064,
-                    'average_cpc': 1.75,
-                    'cost': 428.75,
-                    'conversions': 12,
-                    'conversion_rate': 0.049,
-                    'quality_score': 7,
-                    'status': 'high_performing'
-                },
-                {
-                    'keyword': 'athlete mindset training',
-                    'match_type': 'BROAD',
-                    'impressions': 1890,
-                    'clicks': 95,
-                    'ctr': 0.050,
-                    'average_cpc': 1.45,
-                    'cost': 137.75,
-                    'conversions': 3,
-                    'conversion_rate': 0.032,
-                    'quality_score': 6,
-                    'status': 'needs_optimization'
-                },
-                {
-                    'keyword': 'youth sports books',
-                    'match_type': 'EXACT',
-                    'impressions': 950,
-                    'clicks': 85,
-                    'ctr': 0.089,
-                    'average_cpc': 1.95,
-                    'cost': 165.75,
-                    'conversions': 5,
-                    'conversion_rate': 0.059,
-                    'quality_score': 9,
-                    'status': 'high_performing'
-                }
-            ]
+        """
+        Analyze real keyword performance data from Google Ads API.
+        
+        Args:
+            campaign_id: Google Ads campaign ID
             
-            # Analyze performance and categorize keywords
-            analysis = {
-                'total_keywords': len(keyword_data),
-                'high_performing_keywords': [kw for kw in keyword_data if kw['status'] == 'high_performing'],
-                'underperforming_keywords': [kw for kw in keyword_data if kw['status'] == 'needs_optimization'],
-                'optimization_opportunities': [
-                    {
-                        'keyword': 'athlete mindset training',
-                        'issue': 'Low conversion rate',
-                        'recommendation': 'Add negative keywords to improve relevancy',
-                        'potential_impact': 'Increase conversion rate by 15-25%'
-                    }
-                ],
-                'top_performers': sorted(keyword_data, key=lambda x: x['conversion_rate'], reverse=True)[:3],
-                'average_quality_score': sum(kw['quality_score'] for kw in keyword_data) / len(keyword_data),
-                'total_impressions': sum(kw['impressions'] for kw in keyword_data),
-                'total_clicks': sum(kw['clicks'] for kw in keyword_data),
-                'overall_ctr': sum(kw['clicks'] for kw in keyword_data) / sum(kw['impressions'] for kw in keyword_data)
+        Returns:
+            Dictionary containing keyword performance analysis
+        """
+        try:
+            # Build query for keyword performance
+            query = f"""
+                SELECT 
+                    ad_group_criterion.keyword.text,
+                    ad_group_criterion.keyword.match_type,
+                    ad_group_criterion.quality_info.quality_score,
+                    metrics.impressions,
+                    metrics.clicks,
+                    metrics.cost_micros,
+                    metrics.conversions,
+                    metrics.ctr,
+                    metrics.average_cpc,
+                    ad_group.id,
+                    ad_group.name
+                FROM keyword_view 
+                WHERE campaign.id = {campaign_id}
+                AND segments.date DURING LAST_30_DAYS
+                AND ad_group_criterion.status = 'ENABLED'
+                ORDER BY metrics.impressions DESC
+                LIMIT 100
+            """
+            
+            # Execute query
+            ga_service = self.client.get_service("GoogleAdsService")
+            search_request = self.client.get_type("SearchGoogleAdsRequest")
+            search_request.customer_id = self.customer_id
+            search_request.query = query
+            
+            response = ga_service.search(request=search_request)
+            
+            # Process keyword data
+            keywords = []
+            top_performers = []
+            underperformers = []
+            
+            for row in response:
+                keyword_data = {
+                    'keyword': row.ad_group_criterion.keyword.text,
+                    'match_type': row.ad_group_criterion.keyword.match_type.name,
+                    'quality_score': row.ad_group_criterion.quality_info.quality_score,
+                    'impressions': row.metrics.impressions,
+                    'clicks': row.metrics.clicks,
+                    'cost': row.metrics.cost_micros / 1_000_000,
+                    'conversions': row.metrics.conversions,
+                    'ctr': row.metrics.ctr,
+                    'avg_cpc': row.metrics.average_cpc / 1_000_000,
+                    'ad_group_id': row.ad_group.id,
+                    'ad_group_name': row.ad_group.name
+                }
+                
+                keywords.append(keyword_data)
+                
+                # Classify performance
+                if keyword_data['ctr'] > 2.0 and keyword_data['quality_score'] >= 7:
+                    top_performers.append(keyword_data)
+                elif keyword_data['ctr'] < 1.0 or keyword_data['quality_score'] < 5:
+                    underperformers.append(keyword_data)
+            
+            # Calculate summary statistics
+            total_keywords = len(keywords)
+            avg_quality_score = sum(k['quality_score'] for k in keywords) / total_keywords if total_keywords > 0 else 0
+            avg_ctr = sum(k['ctr'] for k in keywords) / total_keywords if total_keywords > 0 else 0
+            
+            return {
+                'total_keywords': total_keywords,
+                'avg_quality_score': round(avg_quality_score, 1),
+                'avg_ctr': round(avg_ctr, 2),
+                'top_performers': top_performers[:10],
+                'underperformers': underperformers[:10],
+                'all_keywords': keywords,
+                'performance_distribution': {
+                    'high_performers': len(top_performers),
+                    'underperformers': len(underperformers),
+                    'moderate_performers': total_keywords - len(top_performers) - len(underperformers)
+                },
+                'data_source': 'google_ads_api',
+                'last_updated': datetime.now().isoformat()
             }
             
-            return analysis
-            
+        except GoogleAdsException as ex:
+            logger.error(f"Google Ads API error analyzing keywords: {ex}")
+            return {'error': f'Google Ads API error: {ex.error.message}'}
         except Exception as e:
             logger.error(f"Error analyzing keyword performance: {str(e)}")
             return {'error': str(e)}
     
     def _analyze_ad_performance(self, campaign_id: str) -> Dict:
-        """Analyze ad performance and creative effectiveness."""
-        try:
-            # Sample ad performance data
-            ad_data = [
-                {
-                    'ad_id': 'ad_001',
-                    'headlines': ['Transform Your Athletic Mindset', 'Mental Toughness Guide', 'Unstoppable Athletes'],
-                    'descriptions': ['Discover psychological strategies that separate champions', 'Build unbreakable mental resilience'],
-                    'impressions': 8420,
-                    'clicks': 675,
-                    'ctr': 0.080,
-                    'conversions': 28,
-                    'conversion_rate': 0.041,
-                    'cost': 1247.50,
-                    'cost_per_conversion': 44.55,
-                    'ad_strength': 'EXCELLENT'
-                },
-                {
-                    'ad_id': 'ad_002', 
-                    'headlines': ['Young Athletes Mental Training', 'Sports Psychology Secrets', 'Champion Mindset Book'],
-                    'descriptions': ['Master the mental game for greatness', 'Proven techniques from elite coaches'],
-                    'impressions': 7000,
-                    'clicks': 420,
-                    'ctr': 0.060,
-                    'conversions': 19,
-                    'conversion_rate': 0.045,
-                    'cost': 819.00,
-                    'cost_per_conversion': 43.11,
-                    'ad_strength': 'GOOD'
-                }
-            ]
+        """
+        Analyze real ad performance data from Google Ads API.
+        
+        Args:
+            campaign_id: Google Ads campaign ID
             
-            # Analyze ad performance
-            analysis = {
-                'total_ads': len(ad_data),
-                'best_performing_ad': max(ad_data, key=lambda x: x['conversion_rate']),
-                'worst_performing_ad': min(ad_data, key=lambda x: x['conversion_rate']),
-                'average_ctr': sum(ad['ctr'] for ad in ad_data) / len(ad_data),
-                'average_conversion_rate': sum(ad['conversion_rate'] for ad in ad_data) / len(ad_data),
-                'creative_insights': [
-                    {
-                        'insight': 'Headlines with "Transform" perform 25% better',
-                        'recommendation': 'Include transformation language in new ads',
-                        'confidence': 0.85
-                    },
-                    {
-                        'insight': 'Specific benefits outperform general claims',
-                        'recommendation': 'Use specific outcomes like "Build unbreakable mental resilience"',
-                        'confidence': 0.78
-                    }
-                ],
-                'optimization_recommendations': [
-                    'Test new headlines with "unlock", "master", "achieve" power words',
-                    'Add urgency elements like "limited time" or "start today"',
-                    'Test different description combinations for better CTR'
-                ]
+        Returns:
+            Dictionary containing ad performance analysis
+        """
+        try:
+            # Build query for ad performance
+            query = f"""
+                SELECT 
+                    ad_group_ad.ad.id,
+                    ad_group_ad.ad.final_urls,
+                    ad_group_ad.ad.responsive_search_ad.headlines,
+                    ad_group_ad.ad.responsive_search_ad.descriptions,
+                    ad_group_ad.status,
+                    metrics.impressions,
+                    metrics.clicks,
+                    metrics.cost_micros,
+                    metrics.conversions,
+                    metrics.ctr,
+                    metrics.average_cpc,
+                    ad_group.id,
+                    ad_group.name
+                FROM ad_group_ad 
+                WHERE campaign.id = {campaign_id}
+                AND segments.date DURING LAST_30_DAYS
+                AND ad_group_ad.status = 'ENABLED'
+                ORDER BY metrics.impressions DESC
+                LIMIT 50
+            """
+            
+            # Execute query
+            ga_service = self.client.get_service("GoogleAdsService")
+            search_request = self.client.get_type("SearchGoogleAdsRequest")
+            search_request.customer_id = self.customer_id
+            search_request.query = query
+            
+            response = ga_service.search(request=search_request)
+            
+            # Process ad data
+            ads = []
+            best_performing = []
+            needs_optimization = []
+            
+            for row in response:
+                # Extract headlines and descriptions
+                headlines = [asset.text for asset in row.ad_group_ad.ad.responsive_search_ad.headlines]
+                descriptions = [asset.text for asset in row.ad_group_ad.ad.responsive_search_ad.descriptions]
+                
+                ad_data = {
+                    'ad_id': row.ad_group_ad.ad.id,
+                    'headlines': headlines,
+                    'descriptions': descriptions,
+                    'final_urls': [url for url in row.ad_group_ad.ad.final_urls],
+                    'status': row.ad_group_ad.status.name,
+                    'impressions': row.metrics.impressions,
+                    'clicks': row.metrics.clicks,
+                    'cost': row.metrics.cost_micros / 1_000_000,
+                    'conversions': row.metrics.conversions,
+                    'ctr': row.metrics.ctr,
+                    'avg_cpc': row.metrics.average_cpc / 1_000_000,
+                    'ad_group_id': row.ad_group.id,
+                    'ad_group_name': row.ad_group.name
+                }
+                
+                ads.append(ad_data)
+                
+                # Classify performance
+                if ad_data['ctr'] > 3.0 and ad_data['conversions'] > 0:
+                    best_performing.append(ad_data)
+                elif ad_data['ctr'] < 1.5 or ad_data['impressions'] > 1000 and ad_data['conversions'] == 0:
+                    needs_optimization.append(ad_data)
+            
+            # Calculate summary statistics
+            total_ads = len(ads)
+            avg_ctr = sum(ad['ctr'] for ad in ads) / total_ads if total_ads > 0 else 0
+            total_conversions = sum(ad['conversions'] for ad in ads)
+            
+            return {
+                'total_ads': total_ads,
+                'avg_ctr': round(avg_ctr, 2),
+                'total_conversions': total_conversions,
+                'best_performing': best_performing[:5],
+                'needs_optimization': needs_optimization[:5],
+                'all_ads': ads,
+                'performance_insights': {
+                    'high_performers': len(best_performing),
+                    'needs_optimization': len(needs_optimization),
+                    'stable_performers': total_ads - len(best_performing) - len(needs_optimization)
+                },
+                'data_source': 'google_ads_api',
+                'last_updated': datetime.now().isoformat()
             }
             
-            return analysis
-            
+        except GoogleAdsException as ex:
+            logger.error(f"Google Ads API error analyzing ads: {ex}")
+            return {'error': f'Google Ads API error: {ex.error.message}'}
         except Exception as e:
             logger.error(f"Error analyzing ad performance: {str(e)}")
             return {'error': str(e)}
     
-    def _generate_optimization_actions(self, performance_data: Dict, keyword_analysis: Dict, ad_analysis: Dict) -> List[Dict]:
-        """Generate specific optimization actions based on performance data."""
+    def _get_campaign_budget_data(self, campaign_id: str) -> Dict:
+        """
+        Get real campaign budget data from Google Ads API.
+        
+        Args:
+            campaign_id: Google Ads campaign ID
+            
+        Returns:
+            Dictionary containing budget information and spending data
+        """
         try:
-            actions = []
+            # Build query for campaign budget data
+            query = f"""
+                SELECT 
+                    campaign.id,
+                    campaign.name,
+                    campaign_budget.amount_micros,
+                    campaign_budget.delivery_method,
+                    campaign_budget.total_amount_micros,
+                    metrics.cost_micros,
+                    segments.date
+                FROM campaign 
+                WHERE campaign.id = {campaign_id}
+                AND segments.date DURING LAST_30_DAYS
+                ORDER BY segments.date DESC
+            """
             
-            # Budget optimization actions
-            if performance_data.get('roas', 0) > 3.0:
-                actions.append({
-                    'type': 'budget_increase',
-                    'action': 'Increase daily budget by 20%',
-                    'reason': f'High ROAS of {performance_data.get("roas", 0):.2f} indicates profitable scaling opportunity',
-                    'priority': 'high',
-                    'expected_impact': 'Increase conversions by 15-25%'
+            # Execute query
+            ga_service = self.client.get_service("GoogleAdsService")
+            search_request = self.client.get_type("SearchGoogleAdsRequest")
+            search_request.customer_id = self.customer_id
+            search_request.query = query
+            
+            response = ga_service.search(request=search_request)
+            
+            # Process budget data
+            daily_spends = []
+            total_spend = 0
+            budget_amount = 0
+            
+            for row in response:
+                daily_cost = row.metrics.cost_micros / 1_000_000
+                daily_spends.append({
+                    'date': row.segments.date.strftime('%Y-%m-%d'),
+                    'spend': daily_cost
                 })
+                total_spend += daily_cost
+                budget_amount = row.campaign_budget.amount_micros / 1_000_000  # Daily budget
             
-            # Keyword optimization actions
-            if keyword_analysis.get('average_quality_score', 0) < 7:
-                actions.append({
-                    'type': 'keyword_optimization',
-                    'action': 'Improve ad relevance and landing page experience',
-                    'reason': f'Average quality score of {keyword_analysis.get("average_quality_score", 0):.1f} is below target',
-                    'priority': 'medium',
-                    'expected_impact': 'Reduce CPC by 10-15%'
-                })
-            
-            # Add negative keywords for underperforming terms
-            underperforming = keyword_analysis.get('underperforming_keywords', [])
-            if underperforming:
-                actions.append({
-                    'type': 'negative_keywords',
-                    'action': f'Add negative keywords for {len(underperforming)} underperforming terms',
-                    'reason': 'Remove irrelevant traffic to improve conversion rate',
-                    'priority': 'medium',
-                    'expected_impact': 'Increase conversion rate by 10-20%'
-                })
-            
-            # Ad creative optimization
-            if ad_analysis.get('average_ctr', 0) < 0.05:
-                actions.append({
-                    'type': 'ad_creative',
-                    'action': 'Test new ad variations with power words',
-                    'reason': f'CTR of {ad_analysis.get("average_ctr", 0):.3f} below industry average',
-                    'priority': 'high',
-                    'expected_impact': 'Improve CTR by 20-30%'
-                })
-            
-            # Bid strategy optimization
-            if performance_data.get('cost_per_conversion', 100) > 50:
-                actions.append({
-                    'type': 'bid_optimization',
-                    'action': 'Switch to Target CPA bidding strategy',
-                    'reason': f'High cost per conversion of ${performance_data.get("cost_per_conversion", 0):.2f}',
-                    'priority': 'high',
-                    'expected_impact': 'Reduce cost per conversion by 15-25%'
-                })
-            
-            return actions
-            
-        except Exception as e:
-            logger.error(f"Error generating optimization actions: {str(e)}")
-            return []
-    
-    def _apply_optimizations(self, campaign_id: str, optimizations: List[Dict]) -> List[Dict]:
-        """Apply optimizations to the campaign."""
-        try:
-            applied_optimizations = []
-            
-            for optimization in optimizations:
-                # Simulate applying optimization based on type
-                if optimization['type'] == 'budget_increase':
-                    # In real implementation, would increase campaign budget
-                    applied_optimizations.append({
-                        'optimization_type': optimization['type'],
-                        'action_taken': 'Increased daily budget by 20%',
-                        'status': 'applied',
-                        'timestamp': datetime.now().isoformat(),
-                        'expected_result': optimization.get('expected_impact', 'Performance improvement')
-                    })
-                
-                elif optimization['type'] == 'negative_keywords':
-                    # In real implementation, would add negative keywords
-                    applied_optimizations.append({
-                        'optimization_type': optimization['type'],
-                        'action_taken': 'Added 5 negative keywords to improve relevancy',
-                        'status': 'applied',
-                        'timestamp': datetime.now().isoformat(),
-                        'expected_result': optimization.get('expected_impact', 'Better traffic quality')
-                    })
-                
-                elif optimization['type'] == 'ad_creative':
-                    # In real implementation, would create new ad variations
-                    applied_optimizations.append({
-                        'optimization_type': optimization['type'],
-                        'action_taken': 'Created 2 new ad variations with power words',
-                        'status': 'applied',
-                        'timestamp': datetime.now().isoformat(),
-                        'expected_result': optimization.get('expected_impact', 'Higher CTR')
-                    })
-                
-                elif optimization['type'] == 'bid_optimization':
-                    # In real implementation, would change bidding strategy
-                    applied_optimizations.append({
-                        'optimization_type': optimization['type'],
-                        'action_taken': 'Switched to Target CPA bidding with $45 target',
-                        'status': 'applied',
-                        'timestamp': datetime.now().isoformat(),
-                        'expected_result': optimization.get('expected_impact', 'Lower cost per conversion')
-                    })
-            
-            logger.info(f"Applied {len(applied_optimizations)} optimizations to campaign {campaign_id}")
-            return applied_optimizations
-            
-        except Exception as e:
-            logger.error(f"Error applying optimizations: {str(e)}")
-            return []
-    
-    def _calculate_optimization_impact(self, optimizations: List[Dict]) -> Dict:
-        """Calculate expected impact of optimizations."""
-        try:
-            # Calculate cumulative impact across all optimizations
-            expected_improvements = {
-                'conversion_rate_improvement': 0,
-                'ctr_improvement': 0,
-                'cost_reduction': 0,
-                'roas_improvement': 0
-            }
-            
-            for opt in optimizations:
-                opt_type = opt.get('optimization_type', '')
-                
-                if opt_type == 'budget_increase':
-                    expected_improvements['conversion_rate_improvement'] += 0.20  # 20% more conversions
-                elif opt_type == 'negative_keywords':
-                    expected_improvements['conversion_rate_improvement'] += 0.15  # 15% better conversion rate
-                    expected_improvements['cost_reduction'] += 0.10  # 10% cost reduction
-                elif opt_type == 'ad_creative':
-                    expected_improvements['ctr_improvement'] += 0.25  # 25% CTR improvement
-                elif opt_type == 'bid_optimization':
-                    expected_improvements['cost_reduction'] += 0.20  # 20% cost reduction
-                    expected_improvements['roas_improvement'] += 0.15  # 15% ROAS improvement
-            
-            # Calculate overall impact score
-            impact_score = (
-                expected_improvements['conversion_rate_improvement'] * 0.3 +
-                expected_improvements['ctr_improvement'] * 0.25 +
-                expected_improvements['cost_reduction'] * 0.25 +
-                expected_improvements['roas_improvement'] * 0.20
-            )
+            # Calculate budget utilization metrics
+            days_in_period = len(daily_spends)
+            avg_daily_spend = total_spend / days_in_period if days_in_period > 0 else 0
+            budget_utilization = (avg_daily_spend / budget_amount) if budget_amount > 0 else 0
+            projected_monthly_spend = avg_daily_spend * 30
             
             return {
-                'overall_impact_score': min(impact_score, 1.0),  # Cap at 100%
-                'expected_improvements': expected_improvements,
-                'estimated_performance_lift': f"{impact_score * 100:.1f}%",
-                'confidence_level': self._calculate_optimization_confidence(optimizations),
-                'implementation_timeline': '1-2 weeks for full impact'
-            }
-            
-        except Exception as e:
-            logger.error(f"Error calculating optimization impact: {str(e)}")
-            return {'error': str(e)}
-    
-    def _calculate_optimization_confidence(self, optimizations: List[Dict]) -> float:
-        """Calculate confidence score for optimizations."""
-        # Implementation for confidence calculation
-        return 0.85
-    
-    def _get_campaign_budget_data(self, campaign_id: str) -> Dict:
-        """Get budget data for specific campaign."""
-        try:
-            # In real implementation, this would query the Google Ads API for budget data
-            # For now, return realistic sample data
-            budget_data = {
                 'campaign_id': campaign_id,
-                'daily_budget': 35.0,
-                'current_spend': 28.50,
-                'remaining_budget': 6.50,
-                'utilization_rate': 0.814,  # 81.4%
-                'budget_period': 'daily',
-                'monthly_projected_spend': 855.0,
-                'monthly_budget': 1050.0,
-                'days_remaining_in_month': 8,
-                'average_daily_spend': 28.50,
-                'spend_trend': 'increasing',  # increasing, decreasing, stable
-                'budget_status': 'on_track',  # on_track, overspending, underspending
+                'daily_budget': budget_amount,
+                'total_spend_30_days': round(total_spend, 2),
+                'avg_daily_spend': round(avg_daily_spend, 2),
+                'budget_utilization': round(budget_utilization * 100, 1),
+                'projected_monthly_spend': round(projected_monthly_spend, 2),
+                'daily_spend_history': daily_spends[-7:],  # Last 7 days
+                'budget_status': 'over_budget' if budget_utilization > 1.0 else 'under_budget' if budget_utilization < 0.8 else 'on_track',
+                'data_source': 'google_ads_api',
                 'last_updated': datetime.now().isoformat()
             }
             
-            # Calculate additional metrics
-            if budget_data['utilization_rate'] > 0.9:
-                budget_data['budget_status'] = 'overspending'
-            elif budget_data['utilization_rate'] < 0.5:
-                budget_data['budget_status'] = 'underspending'
-            
-            logger.info(f"Retrieved budget data for campaign {campaign_id}")
-            return budget_data
-            
+        except GoogleAdsException as ex:
+            logger.error(f"Google Ads API error getting budget data: {ex}")
+            return {'error': f'Google Ads API error: {ex.error.message}'}
         except Exception as e:
             logger.error(f"Error getting campaign budget data: {str(e)}")
             return {'error': str(e)}
-    
-    def _identify_budget_optimizations(self, budget_data: Dict) -> List[Dict]:
-        """Identify budget optimization opportunities."""
-        try:
-            optimizations = []
-            
-            for campaign_id, data in budget_data.items():
-                if isinstance(data, dict) and 'utilization_rate' in data:
-                    utilization = data['utilization_rate']
-                    
-                    # High utilization - increase budget opportunity
-                    if utilization > 0.85:
-                        optimizations.append({
-                            'campaign_id': campaign_id,
-                            'type': 'budget_increase',
-                            'current_utilization': utilization,
-                            'recommendation': 'Increase daily budget by 25-50%',
-                            'reason': 'High budget utilization indicates strong performance',
-                            'potential_impact': 'Capture additional traffic and conversions',
-                            'priority': 'high' if utilization > 0.95 else 'medium',
-                            'suggested_budget_increase': data.get('daily_budget', 0) * 0.3
-                        })
-                    
-                    # Low utilization - reduce budget or improve targeting
-                    elif utilization < 0.4:
-                        optimizations.append({
-                            'campaign_id': campaign_id,
-                            'type': 'budget_optimization',
-                            'current_utilization': utilization,
-                            'recommendation': 'Reduce budget or improve targeting',
-                            'reason': 'Low budget utilization suggests limited traffic or poor targeting',
-                            'potential_impact': 'Reallocate budget to better performing campaigns',
-                            'priority': 'medium',
-                            'suggested_budget_reduction': data.get('daily_budget', 0) * 0.2
-                        })
-                    
-                    # Uneven spending patterns
-                    if data.get('spend_trend') == 'increasing':
-                        optimizations.append({
-                            'campaign_id': campaign_id,
-                            'type': 'spend_smoothing',
-                            'recommendation': 'Implement dayparting to smooth spend',
-                            'reason': 'Uneven spending patterns detected',
-                            'potential_impact': 'More consistent daily performance',
-                            'priority': 'low'
-                        })
-            
-            return optimizations
-            
-        except Exception as e:
-            logger.error(f"Error identifying budget optimizations: {str(e)}")
-            return []
-    
-    def _generate_budget_reallocation_plan(self, budget_data: Dict) -> Dict:
-        """Generate plan for budget reallocation."""
-        try:
-            # Calculate total budget and spending
-            total_budget = 0
-            total_spend = 0
-            campaign_performance = []
-            
-            for campaign_id, data in budget_data.items():
-                if isinstance(data, dict) and 'daily_budget' in data:
-                    total_budget += data['daily_budget']
-                    total_spend += data['current_spend']
-                    
-                    # Calculate performance score for each campaign
-                    performance_score = self._calculate_campaign_performance_score(data)
-                    campaign_performance.append({
-                        'campaign_id': campaign_id,
-                        'current_budget': data['daily_budget'],
-                        'current_spend': data['current_spend'],
-                        'utilization_rate': data['utilization_rate'],
-                        'performance_score': performance_score
-                    })
-            
-            # Sort campaigns by performance score
-            campaign_performance.sort(key=lambda x: x['performance_score'], reverse=True)
-            
-            # Generate reallocation recommendations
-            reallocation_plan = {
-                'total_daily_budget': total_budget,
-                'total_daily_spend': total_spend,
-                'overall_utilization': total_spend / total_budget if total_budget > 0 else 0,
-                'reallocation_recommendations': [],
-                'expected_improvement': {
-                    'efficiency_gain': '12-18%',
-                    'cost_reduction': '8-15%',
-                    'conversion_improvement': '10-20%'
-                }
-            }
-            
-            # Generate specific reallocation actions
-            for i, campaign in enumerate(campaign_performance):
-                if i < len(campaign_performance) // 2:  # Top performing campaigns
-                    if campaign['utilization_rate'] > 0.8:
-                        reallocation_plan['reallocation_recommendations'].append({
-                            'campaign_id': campaign['campaign_id'],
-                            'action': 'increase_budget',
-                            'current_budget': campaign['current_budget'],
-                            'recommended_budget': campaign['current_budget'] * 1.2,
-                            'reason': 'High performance and utilization',
-                            'priority': 'high'
-                        })
-                else:  # Lower performing campaigns
-                    if campaign['utilization_rate'] < 0.5:
-                        reallocation_plan['reallocation_recommendations'].append({
-                            'campaign_id': campaign['campaign_id'],
-                            'action': 'reduce_budget',
-                            'current_budget': campaign['current_budget'],
-                            'recommended_budget': campaign['current_budget'] * 0.8,
-                            'reason': 'Low performance and utilization',
-                            'priority': 'medium'
-                        })
-            
-            return reallocation_plan
-            
-        except Exception as e:
-            logger.error(f"Error generating budget reallocation plan: {str(e)}")
-            return {'error': str(e)}
-    
-    def _calculate_campaign_performance_score(self, campaign_data: Dict) -> float:
-        """Calculate performance score for a campaign."""
-        try:
-            # Base score on utilization rate
-            utilization_score = min(campaign_data.get('utilization_rate', 0), 1.0)
-            
-            # Factor in spend consistency (stable spending is good)
-            spend_trend = campaign_data.get('spend_trend', 'stable')
-            trend_score = 1.0 if spend_trend == 'stable' else 0.8
-            
-            # Status score
-            status = campaign_data.get('budget_status', 'on_track')
-            status_score = 1.0 if status == 'on_track' else 0.7
-            
-            # Combine scores
-            performance_score = (utilization_score * 0.5) + (trend_score * 0.3) + (status_score * 0.2)
-            
-            return min(performance_score, 1.0)
-            
-        except Exception as e:
-            logger.error(f"Error calculating campaign performance score: {str(e)}")
-            return 0.5
     
     def _apply_geographic_targeting(self, campaign, geographic_targets: List[str]):
         """Apply geographic targeting to campaign."""

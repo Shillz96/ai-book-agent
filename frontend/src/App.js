@@ -10,6 +10,9 @@ import Settings from './Settings';
 // Import the new OnboardingGuide component
 import OnboardingGuide from './OnboardingGuide';
 
+// Import the new Navbar component
+// import Navbar from './components/Navbar';
+
 // Firebase App initialization
 import { initializeApp } from 'firebase/app';
 
@@ -40,6 +43,99 @@ import {
 
 // Firebase Context for providing Firebase services throughout the app
 const FirebaseContext = createContext(null);
+
+// Modern Icons Component for better visual hierarchy
+const Icons = {
+  Book: () => (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+    </svg>
+  ),
+  Robot: () => (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+  ),
+  Warning: () => (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 18.5c-.77.833.192 2.5 1.732 2.5z" />
+    </svg>
+  ),
+  Chart: () => (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+    </svg>
+  ),
+  Growth: () => (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+    </svg>
+  ),
+  Settings: () => (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  ),
+  Magic: () => (
+    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+  ),
+  Sparkles: () => (
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+  ),
+  Edit: () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+    </svg>
+  ),
+  Check: () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+    </svg>
+  ),
+  X: () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  ),
+  ExternalLink: () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+    </svg>
+  )
+};
+
+// Modern Status Badge Component
+const StatusBadge = ({ status, className = "" }) => {
+  const getStatusStyles = () => {
+    switch (status) {
+      case 'active':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'inactive':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'ai':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium border ${getStatusStyles()} ${className}`}>
+      {status === 'ai' && <Icons.Sparkles />}
+      {status === 'active' && '🟢'}
+      {status === 'pending' && '🟡'}
+      {status === 'inactive' && '⚪'}
+      {status.charAt(0).toUpperCase() + status.slice(1)}
+    </span>
+  );
+};
 
 // Main App component
 function App() {
@@ -179,8 +275,8 @@ function App() {
       
       await setDoc(userRef, {
         onboardingCompleted: true,
-        onboardingCompletedAt: serverTimestamp(),
-        firstLoginAt: serverTimestamp()
+        onboardingCompletedAt: new Date().toISOString(),  // Use ISO string instead of serverTimestamp()
+        firstLoginAt: new Date().toISOString()  // Use ISO string instead of serverTimestamp()
       }, { merge: true });
       
       setOnboardingCompleted(true);
@@ -647,6 +743,8 @@ function App() {
 
     try {
       const result = await makeAPICall('/predict-performance', {
+        user_id: userId,
+        app_id: window.__app_id || 'default-app-id',
         content_data: {
           content: content,
           content_type: 'text',
@@ -797,17 +895,19 @@ function App() {
       // Set default values if no settings exist
       setEditingSettings({
         bookTitle: 'Unstoppable: Young Athletes Mental Strength',
-        bookAuthor: 'Author Name',
+        bookAuthor: 'Author Name', // Update this with your actual name
         amazonLink: 'https://www.amazon.com/Unstoppable-young-athletes-mental-strength/dp/B0BBJ56YYQ',
-        audibleLink: 'https://audible.com/pd/B0BBJ56YYQ',
-        landingPageUrl: 'https://your-book-website.com',
+        audibleLink: 'https://audible.com/pd/B0BBJ56YYQ', // Update if you have an Audible version
+        landingPageUrl: 'https://your-book-website.com', // Update with your actual landing page
         monthlyBudget: 2500,
         contentGuidelines: 'Focus on mental strength, resilience, and peak performance for young athletes. Use motivational and inspiring tone. Target parents, coaches, and young athletes aged 12-18. Emphasize growth mindset, confidence building, and overcoming challenges in youth sports.',
         humanInLoopEnabled: true,
+        // Additional settings specific to sports psychology book
         targetAudience: 'Parents of young athletes, youth coaches, high school athletes, sports psychologists',
-        bookGenre: 'Sports Psychology / Youth Development',
+        bookGenre: 'Sports Psychology / Youth Development', 
         keyThemes: 'Mental toughness, resilience, confidence, goal setting, pressure management, youth sports',
-        marketingTone: 'Motivational, professional, inspiring, empowering'
+        marketingTone: 'Motivational, professional, inspiring, empowering',
+        lastUpdated: new Date().toISOString()  // Use ISO string instead of serverTimestamp()
       });
     }
     setShowSettingsModal(true);
@@ -821,55 +921,40 @@ function App() {
 
   // Function to generate new marketing posts
   const generateNewPosts = async () => {
-    if (!db || !userId) {
-      showCustomModal("Database connection not available. Please refresh the page.");
+    if (!userId) {
+      showCustomModal("User authentication required. Please refresh the page.");
       return;
     }
 
     try {
-      showCustomModal("🤖 Generating new marketing posts... This may take a moment.");
+      showCustomModal("🤖 Generating AI-powered marketing posts... This may take a moment.");
       
-      const appId = window.__app_id || 'default-app-id';
-      const postsColRef = collection(db, 'artifacts', appId, 'users', userId, 'posts');
-      
-      // Sample marketing posts based on book settings
-      const samplePosts = [
-        {
-          platform: 'Twitter',
-          content: `🏆 Unlock your young athlete's mental strength! ${bookSettings?.bookTitle || 'Unstoppable'} teaches resilience, confidence, and peak performance. Perfect for parents and coaches! 💪 #YouthSports #MentalToughness #ParentingTips`,
-          status: 'pending_approval',
-          createdAt: serverTimestamp(),
-          scheduledFor: null,
-          mediaUrl: null
-        },
-        {
-          platform: 'Facebook',
-          content: `Does your young athlete struggle with pressure during games? 🤔\n\n${bookSettings?.bookTitle || 'Unstoppable'} provides proven strategies to help young athletes:\n✅ Build unshakeable confidence\n✅ Handle pressure like a pro\n✅ Bounce back from setbacks\n✅ Develop a champion mindset\n\nGet your copy today and watch your athlete thrive! 🌟`,
-          status: 'pending_approval',
-          createdAt: serverTimestamp(),
-          scheduledFor: null,
-          mediaUrl: null
-        },
-        {
-          platform: 'Instagram',
-          content: `Mental toughness isn't just for pro athletes! 💯\n\nEvery young athlete can develop:\n🧠 Focus under pressure\n💪 Resilience after defeats\n🎯 Goal-setting skills\n🏆 Champion confidence\n\nStart their journey with ${bookSettings?.bookTitle || 'Unstoppable'} today!\n\n#YouthAthletes #MentalStrength #SportsParents #Coaching`,
-          status: 'pending_approval',
-          createdAt: serverTimestamp(),
-          scheduledFor: null,
-          mediaUrl: null
-        }
-      ];
+      // Call the backend API to generate posts using OpenAI
+      const response = await makeAPICall('/generate-posts', {
+        user_id: userId,
+        app_id: window.__app_id || 'default-app-id',
+        platforms: ['twitter', 'facebook', 'instagram'],
+        count_per_platform: 2  // Generate 2 posts per platform for variety
+      });
 
-      // Add posts to Firestore
-      for (const post of samplePosts) {
-        await addDoc(postsColRef, post);
+      if (response.success) {
+        showCustomModal(`✅ Successfully generated ${response.posts_generated} new AI-powered marketing posts! Check the pending approvals section below.`);
+      } else {
+        // Handle specific error cases
+        if (response.requires_config) {
+          showCustomModal(`⚙️ ${response.message}\n\nPlease go to Settings → OpenAI Configuration to add your API key.`);
+        } else {
+          showCustomModal(`❌ Error: ${response.error || 'Unknown error occurred'}`);
+        }
       }
-      
-      showCustomModal("✅ Successfully generated 3 new marketing posts! Check the pending approvals section below.");
       
     } catch (error) {
       console.error('Error generating posts:', error);
-      showCustomModal(`❌ Error generating posts: ${error.message}`);
+      if (error.message.includes('OpenAI API key')) {
+        showCustomModal(`🔑 OpenAI API key not configured.\n\nPlease add your OpenAI API key in Settings → OpenAI Configuration to generate AI-powered content.`);
+      } else {
+        showCustomModal(`❌ Error generating posts: ${error.message}`);
+      }
     }
   };
 
@@ -890,9 +975,9 @@ function App() {
       
       await updateDoc(postRef, {
         status: 'approved',
-        approvedAt: serverTimestamp(),
+        approvedAt: new Date().toISOString(),  // Use ISO string instead of serverTimestamp()
         scheduledFor: scheduleTime,
-        lastModified: serverTimestamp()
+        lastModified: new Date().toISOString()  // Use ISO string instead of serverTimestamp()
       });
       
       showCustomModal(`✅ Post approved and scheduled for ${scheduleTime.toLocaleString()}!`);
@@ -943,7 +1028,7 @@ function App() {
       
       await updateDoc(postRef, {
         content: editContent,
-        lastModified: serverTimestamp()
+        lastModified: new Date().toISOString()  // Use ISO string instead of serverTimestamp()
       });
       
       setShowEditModal(false);
@@ -1008,7 +1093,7 @@ function App() {
       
       const updatedSettings = {
         ...editingSettings,
-        lastUpdated: serverTimestamp()
+        lastUpdated: new Date().toISOString()  // Use ISO string instead of serverTimestamp()
       };
 
       await setDoc(userSettingsRef, updatedSettings);
@@ -1182,7 +1267,7 @@ function App() {
             bookGenre: 'Sports Psychology / Youth Development', 
             keyThemes: 'Mental toughness, resilience, confidence, goal setting, pressure management, youth sports',
             marketingTone: 'Motivational, professional, inspiring, empowering',
-            lastUpdated: serverTimestamp()
+            lastUpdated: new Date().toISOString()  // Use ISO string instead of serverTimestamp()
           };
 
           // Save default settings to Firestore with error handling
@@ -1286,13 +1371,13 @@ function App() {
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-3 sm:space-y-0">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-blue-700">
               AI Marketing Dashboard
-            </h1>
-            {userId && (
+                  </h1>
+                {userId && (
               <div className="text-xs sm:text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded-full self-start sm:self-center">
                 User ID: <span className="font-mono text-blue-800">{userId.substring(0, 8)}...</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
           {/* Grid Layout for Cards with enhanced responsive breakpoints */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
@@ -1316,44 +1401,44 @@ function App() {
               </h2>
               
               {/* Conditionally render book settings with responsive spacing */}
-              {bookSettings ? (
+                {bookSettings ? (
                 <div className="space-y-2 sm:space-y-3">
                   <div className="text-sm sm:text-base">
                     <span className="font-semibold">Title:</span> {bookSettings.bookTitle}
-                  </div>
+                        </div>
                   <div className="text-sm sm:text-base">
                     <span className="font-semibold">Author:</span> {bookSettings.bookAuthor}
-                  </div>
+                        </div>
                   <div className="text-sm sm:text-base">
                     <span className="font-semibold">Genre:</span> {bookSettings.bookGenre || 'Not specified'}
-                  </div>
+                        </div>
                   <div className="text-sm sm:text-base">
                     <span className="font-semibold">Target Audience:</span> {bookSettings.targetAudience || 'General'}
-                  </div>
+                      </div>
                   <div className="text-sm sm:text-base">
                     <span className="font-semibold">Amazon Link:</span>{' '}
-                    <a 
-                      href={bookSettings.amazonLink} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
+                      <a 
+                        href={bookSettings.amazonLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 underline break-all focus-ring"
                       aria-label={`Visit Amazon page: ${bookSettings.amazonLink}`}
-                    >
+                      >
                       View on Amazon
-                    </a>
+                      </a>
                   </div>
                   <div className="text-sm sm:text-base">
                     <span className="font-semibold">Landing Page:</span>{' '}
-                    <a 
-                      href={bookSettings.landingPageUrl} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
+                      <a 
+                        href={bookSettings.landingPageUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 underline break-all focus-ring"
                       aria-label={`Visit landing page: ${bookSettings.landingPageUrl}`}
                     >
                       {bookSettings.landingPageUrl}
                     </a>
-                  </div>
+                    </div>
                   <div className="text-sm sm:text-base">
                     <span className="font-semibold">Monthly Budget:</span> ${bookSettings.monthlyBudget?.toFixed(2)}
                   </div>
@@ -1362,8 +1447,8 @@ function App() {
                   </div>
                   <div className="text-sm sm:text-base">
                     <span className="font-semibold">Human-in-Loop:</span> {bookSettings.humanInLoopEnabled ? 'Enabled' : 'Disabled'}
-                  </div>
-                </div>
+              </div>
+            </div>
               ) : (
                 <p className="text-gray-600 text-sm sm:text-base">Loading book settings or none found. Initializing default settings...</p>
               )}
@@ -1376,8 +1461,8 @@ function App() {
               >
                 Edit Settings
               </button>
-            </div>
-
+                </div>
+                
             {/* AI Agent Status Card with responsive design */}
             <div className="bg-gradient-to-br from-purple-50 to-pink-100 p-4 sm:p-6 rounded-lg shadow-md">
               <h2 className="text-lg sm:text-xl font-bold text-purple-800 mb-4 flex items-center">
@@ -1406,24 +1491,24 @@ function App() {
                 }`}>
                   {bookSettings?.humanInLoopEnabled ? 'Human-in-the-Loop' : 'Autonomous'}
                 </span>
-              </div>
-              
+                  </div>
+                  
               {/* Action buttons with responsive spacing */}
               <div className="space-y-2 sm:space-y-3">
-                <button
-                  onClick={generateNewPosts}
+                    <button
+                      onClick={generateNewPosts}
                   className="w-full bg-purple-500 text-white py-2 px-4 rounded-md hover:bg-purple-600 transition duration-150 ease-in-out shadow-md focus-ring text-sm sm:text-base"
                   aria-label="Generate new marketing posts"
-                >
-                  Generate New Posts
-                </button>
-                <button
-                  onClick={analyzePerformanceEnhanced}
+                    >
+                      Generate New Posts
+                    </button>
+                    <button
+                      onClick={analyzePerformanceEnhanced}
                   className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-150 ease-in-out shadow-md focus-ring text-sm sm:text-base"
                   aria-label="Analyze marketing performance"
-                >
-                  Analyze Performance
-                </button>
+                    >
+                      Analyze Performance
+                    </button>
               </div>
             </div>
           </div>
@@ -1448,73 +1533,99 @@ function App() {
             
             {/* Conditionally render pending posts with responsive design */}
             {pendingPosts.length > 0 ? (
-              <div className="space-y-4">
-                {pendingPosts.map((post) => (
+                <div className="space-y-4">
+                  {pendingPosts.map((post) => (
                   <div key={post.id} className="border border-yellow-300 rounded-lg p-3 sm:p-4 bg-yellow-50 shadow-sm">
                     <div className="mb-2 text-sm sm:text-base">
                       <span className="font-semibold">Platform:</span> {post.platform || 'Not specified'}
+                          </div>
+                    <div className="mb-2 text-sm sm:text-base">
+                      <span className="font-semibold">Post Type:</span> {post.post_type || 'General'}
                     </div>
                     <div className="mb-2 text-sm sm:text-base">
                       <span className="font-semibold">Status:</span>{' '}
                       <span className="px-2 py-1 bg-yellow-200 text-yellow-800 rounded text-xs sm:text-sm">
                         {post.status}
                       </span>
+                      {post.generated_by === 'ai' && (
+                        <span className="ml-2 px-2 py-1 bg-blue-200 text-blue-800 rounded text-xs">
+                          🤖 AI Generated
+                        </span>
+                      )}
                     </div>
                     <div className="mb-3 text-sm sm:text-base">
                       <span className="font-semibold">Content:</span>
                       <p className="mt-1 text-gray-700 whitespace-pre-wrap break-words">{post.content}</p>
                     </div>
                     
-                    {/* Conditionally display media with responsive sizing */}
-                    {post.mediaUrl && (
-                      <div className="mb-3">
-                        <span className="font-semibold text-sm sm:text-base">Media:</span>
-                        <img 
-                          src={post.mediaUrl}
-                          alt={`Marketing post media for ${post.platform || 'social platform'}`}
-                          className="mt-1 w-full max-w-xs sm:max-w-sm rounded border"
-                          onError={(e) => {
-                            e.target.src = "https://placehold.co/150x100/CCCCCC/FFFFFF?text=Image+Error";
-                            e.target.alt = "Image failed to load - placeholder displayed";
-                          }}
-                        />
+                    {/* Display generated images for Instagram or regular media */}
+                          {(post.image_url || post.mediaUrl) && (
+                            <div className="mb-3">
+                        <span className="font-semibold text-sm sm:text-base">
+                          {post.image_url ? '🖼️ AI Generated Image:' : 'Media:'}
+                        </span>
+                        <div className="mt-2 relative">
+                              <img 
+                                src={post.image_url || post.mediaUrl}
+                            alt={`${post.platform === 'instagram' ? 'AI generated Instagram image' : 'Marketing post media'} for ${post.platform || 'social platform'}`}
+                            className="w-full max-w-xs sm:max-w-sm rounded border shadow-sm"
+                                onError={(e) => {
+                                  e.target.src = "https://placehold.co/300x300/CCCCCC/FFFFFF?text=Image+Error";
+                              e.target.alt = "Image failed to load - placeholder displayed";
+                                }}
+                              />
+                          {post.image_url && (
+                            <div className="absolute top-2 right-2 bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                              DALL-E 3
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Show additional AI metadata for enhanced transparency */}
+                    {post.generation_metadata && (
+                      <div className="mb-3 text-xs text-gray-600 bg-gray-50 p-2 rounded">
+                        <span className="font-semibold">AI Details:</span> Generated with {post.generation_metadata.model || 'GPT-4'} • 
+                        {post.generation_metadata.image_generated ? ' Image included' : ' Text only'} • 
+                        Type: {post.generation_metadata.prompt_type || post.post_type}
                       </div>
                     )}
                     
                     {/* Action buttons for each post with responsive design */}
                     <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                      <button
-                        onClick={() => approvePost(post.id, post.content)}
+                          <button
+                            onClick={() => approvePost(post.id, post.content)}
                         className="bg-green-600 text-white py-1 px-3 rounded text-sm hover:bg-green-700 transition duration-150 ease-in-out focus-ring"
                         aria-label={`Approve and schedule post: ${post.content.substring(0, 30)}...`}
-                      >
+                          >
                         Approve & Schedule
-                      </button>
-                      <button
-                        onClick={() => startEditPost(post)}
+                          </button>
+                          <button
+                            onClick={() => startEditPost(post)}
                         className="bg-blue-600 text-white py-1 px-3 rounded text-sm hover:bg-blue-700 transition duration-150 ease-in-out focus-ring"
                         aria-label={`Edit post: ${post.content.substring(0, 30)}...`}
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => discardPost(post.id, post.content)}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => discardPost(post.id, post.content)}
                         className="bg-red-600 text-white py-1 px-3 rounded text-sm hover:bg-red-700 transition duration-150 ease-in-out focus-ring"
                         aria-label={`Discard post: ${post.content.substring(0, 30)}...`}
-                      >
-                        Discard
-                      </button>
+                          >
+                            Discard
+                          </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
             ) : (
               <p className="text-gray-600 text-center py-6 sm:py-8 text-sm sm:text-base">
                 No posts awaiting approval. The AI is working hard! 🤖
               </p>
             )}
-          </div>
-
+              </div>
+              
           {/* Performance Overview Placeholder with responsive design */}
           <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6 sm:mb-8 border border-blue-200">
             <h2 className="text-xl sm:text-2xl font-bold text-blue-700 mb-4 flex items-center">
@@ -1539,13 +1650,13 @@ function App() {
               will help you understand which marketing strategies are working best for your book.
             </p>
             
-            <button
-              onClick={viewDetailedReports}
+                <button
+                  onClick={viewDetailedReports}
               className="w-full sm:w-auto bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-150 ease-in-out shadow-md focus-ring text-sm sm:text-base"
               aria-label="View detailed performance reports"
-            >
+                >
               View Detailed Reports
-            </button>
+                </button>
           </div>
 
           {/* Revenue Growth Management Section - NEW AI-DRIVEN OPTIMIZATION */}
@@ -1582,17 +1693,17 @@ function App() {
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   AI analyzes performance metrics, identifies growth opportunities, and generates actionable recommendations.
-                </p>
-                <button
-                  onClick={analyzeRevenuePerformance}
-                  disabled={loading_revenue}
+                  </p>
+                  <button
+                    onClick={analyzeRevenuePerformance}
+                    disabled={loading_revenue}
                   className="w-full bg-green-600 text-white py-2 px-3 rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150 ease-in-out text-xs sm:text-sm"
                   aria-label="Run AI revenue performance analysis"
-                >
-                  {loading_revenue ? 'Analyzing...' : 'Analyze Revenue'}
-                </button>
-              </div>
-
+                  >
+                    {loading_revenue ? 'Analyzing...' : 'Analyze Revenue'}
+                  </button>
+                </div>
+                
               {/* Pricing Optimization Card */}
               <div className="bg-white p-4 rounded-lg shadow-sm border border-green-200">
                 <h3 className="font-bold text-green-800 mb-2 flex items-center text-sm sm:text-base">
@@ -1600,16 +1711,16 @@ function App() {
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Dynamic pricing strategies based on market data, demand patterns, and customer behavior analysis.
-                </p>
-                <button
-                  onClick={optimizePricingStrategy}
+                  </p>
+                  <button
+                    onClick={optimizePricingStrategy}
                   className="w-full bg-amber-600 text-white py-2 px-3 rounded-md hover:bg-amber-700 transition duration-150 ease-in-out text-xs sm:text-sm"
                   aria-label="Optimize pricing strategy with AI"
-                >
-                  Optimize Pricing
-                </button>
-              </div>
-
+                  >
+                    Optimize Pricing
+                  </button>
+                </div>
+                
               {/* Churn Prevention Card */}
               <div className="bg-white p-4 rounded-lg shadow-sm border border-green-200">
                 <h3 className="font-bold text-green-800 mb-2 flex items-center text-sm sm:text-base">
@@ -1617,16 +1728,16 @@ function App() {
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Predict at-risk customers and automatically implement retention strategies to reduce churn.
-                </p>
-                <button
-                  onClick={predictAndPreventChurn}
+                  </p>
+                  <button
+                    onClick={predictAndPreventChurn}
                   className="w-full bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 transition duration-150 ease-in-out text-xs sm:text-sm"
                   aria-label="Run churn prediction and prevention analysis"
-                >
-                  Prevent Churn
-                </button>
-              </div>
-
+                  >
+                    Prevent Churn
+                  </button>
+                </div>
+                
               {/* Performance Analytics Card */}
               <div className="bg-white p-4 rounded-lg shadow-sm border border-green-200">
                 <h3 className="font-bold text-green-800 mb-2 flex items-center text-sm sm:text-base">
@@ -1634,16 +1745,16 @@ function App() {
                 </h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Advanced content performance analysis with predictive insights and optimization recommendations.
-                </p>
-                <button
+                  </p>
+                  <button
                   onClick={analyzeContentPerformance}
-                  disabled={loading_analytics}
+                    disabled={loading_analytics}
                   className="w-full bg-purple-600 text-white py-2 px-3 rounded-md hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150 ease-in-out text-xs sm:text-sm"
                   aria-label="Analyze content performance with AI"
-                >
+                  >
                   {loading_analytics ? 'Analyzing...' : 'Analyze Content'}
-                </button>
-              </div>
+                  </button>
+                </div>
 
               {/* A/B Testing Card */}
               <div className="bg-white p-4 rounded-lg shadow-sm border border-green-200">
@@ -1677,8 +1788,8 @@ function App() {
                 >
                   Predict Performance
                 </button>
-              </div>
             </div>
+          </div>
 
             {/* Quick Actions Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-4 border-t border-green-200">
@@ -1703,7 +1814,7 @@ function App() {
               >
                 🤖 Full AI Analysis
               </button>
-            </div>
+                  </div>
 
             {/* Growth Status Indicator */}
             <div className="mt-4 p-3 bg-green-100 rounded-lg border border-green-300">
@@ -1714,8 +1825,8 @@ function App() {
               <div className="mt-2 text-xs text-green-600">
                 Last optimization: {new Date().toLocaleDateString()} | Target: Autonomous growth with minimal manual input
               </div>
-            </div>
-          </div>
+                </div>
+              </div>
 
           {/* Budget Management Section - NEW */}
           <div className="bg-gradient-to-br from-yellow-50 to-orange-100 p-4 sm:p-6 rounded-lg shadow-md mb-6 sm:mb-8 border border-yellow-200">
@@ -1730,46 +1841,46 @@ function App() {
               <strong>Intelligent budget allocation and optimization.</strong> Track spending across platforms, get alerts when approaching limits, 
               and automatically optimize budget distribution based on performance data.
             </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border border-orange-200">
                 <h3 className="font-bold text-orange-800 mb-2 text-sm sm:text-base">📊 Budget Status</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Current spending, remaining budget, and performance metrics across all platforms.
-                </p>
-                <button
-                  onClick={getBudgetStatus}
-                  disabled={loading_budget}
+                  </p>
+                  <button
+                    onClick={getBudgetStatus}
+                    disabled={loading_budget}
                   className="w-full bg-orange-600 text-white py-2 px-3 rounded-md hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  {loading_budget ? 'Loading...' : 'View Budget Status'}
-                </button>
-              </div>
+                  >
+                    {loading_budget ? 'Loading...' : 'View Budget Status'}
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-orange-200">
                 <h3 className="font-bold text-orange-800 mb-2 text-sm sm:text-base">🔧 Optimize Allocation</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   AI-powered optimization of budget distribution across platforms for maximum ROI.
-                </p>
-                <button
-                  onClick={optimizeBudgetAllocation}
+                  </p>
+                  <button
+                    onClick={optimizeBudgetAllocation}
                   className="w-full bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Optimize Budget
-                </button>
-              </div>
+                  >
+                    Optimize Budget
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-orange-200">
                 <h3 className="font-bold text-orange-800 mb-2 text-sm sm:text-base">📈 Forecast</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Predict spending patterns and ROI for the next period with AI forecasting.
-                </p>
-                <button
-                  onClick={getBudgetForecast}
+                  </p>
+                  <button
+                    onClick={getBudgetForecast}
                   className="w-full bg-purple-600 text-white py-2 px-3 rounded-md hover:bg-purple-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Get Forecast
-                </button>
+                  >
+                    Get Forecast
+                  </button>
               </div>
             </div>
           </div>
@@ -1777,9 +1888,9 @@ function App() {
           {/* Autonomous Operations Section - NEW */}
           <div className="bg-gradient-to-br from-purple-50 to-indigo-100 p-4 sm:p-6 rounded-lg shadow-md mb-6 sm:mb-8 border border-purple-200">
             <h2 className="text-xl sm:text-2xl font-bold text-purple-800 mb-4 flex items-center">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
               ⚡ Autonomous Operations
             </h2>
             
@@ -1787,59 +1898,59 @@ function App() {
               <strong>Fully automated marketing operations.</strong> Let AI handle content creation, posting schedules, 
               performance optimization, and campaign management while you focus on writing your next book.
             </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border border-purple-200">
                 <h3 className="font-bold text-purple-800 mb-2 text-sm sm:text-base">🚀 Start Auto</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Begin fully autonomous marketing operations with AI oversight.
-                </p>
-                <button
-                  onClick={startAutonomousOperation}
-                  disabled={loading_autonomous}
+                  </p>
+                  <button
+                    onClick={startAutonomousOperation}
+                    disabled={loading_autonomous}
                   className="w-full bg-green-600 text-white py-2 px-3 rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  {loading_autonomous ? 'Starting...' : 'Start Auto Mode'}
-                </button>
-              </div>
+                  >
+                    {loading_autonomous ? 'Starting...' : 'Start Auto Mode'}
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-purple-200">
                 <h3 className="font-bold text-purple-800 mb-2 text-sm sm:text-base">⏹️ Stop Auto</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Stop autonomous operations and return to manual control.
-                </p>
-                <button
-                  onClick={stopAutonomousOperation}
+                  </p>
+                  <button
+                    onClick={stopAutonomousOperation}
                   className="w-full bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Stop Auto Mode
-                </button>
-              </div>
+                  >
+                    Stop Auto Mode
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-purple-200">
                 <h3 className="font-bold text-purple-800 mb-2 text-sm sm:text-base">📊 Status</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Check current autonomous operation status and performance metrics.
-                </p>
-                <button
-                  onClick={getAutonomousStatus}
+                  </p>
+                  <button
+                    onClick={getAutonomousStatus}
                   className="w-full bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Check Status
-                </button>
-              </div>
+                  >
+                    Check Status
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-purple-200">
                 <h3 className="font-bold text-purple-800 mb-2 text-sm sm:text-base">⚡ Execute Daily</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Manually trigger today's autonomous operations and content generation.
-                </p>
-                <button
-                  onClick={executeDailyOperations}
+                  </p>
+                  <button
+                    onClick={executeDailyOperations}
                   className="w-full bg-amber-600 text-white py-2 px-3 rounded-md hover:bg-amber-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Execute Daily
-                </button>
+                  >
+                    Execute Daily
+                  </button>
               </div>
             </div>
           </div>
@@ -1847,9 +1958,9 @@ function App() {
           {/* Google Ads Management Section - NEW */}
           <div className="bg-gradient-to-br from-cyan-50 to-blue-100 p-4 sm:p-6 rounded-lg shadow-md mb-6 sm:mb-8 border border-cyan-200">
             <h2 className="text-xl sm:text-2xl font-bold text-cyan-800 mb-4 flex items-center">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-              </svg>
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  </svg>
               🎯 Google Ads Management
             </h2>
             
@@ -1857,33 +1968,33 @@ function App() {
               <strong>Intelligent Google Ads campaign management.</strong> Create, optimize, and manage high-converting 
               ad campaigns with AI-powered keyword research, bid optimization, and performance tracking.
             </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border border-cyan-200">
                 <h3 className="font-bold text-cyan-800 mb-2 text-sm sm:text-base">🎯 Create Campaign</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Launch new Google Ads campaigns with AI-optimized targeting and ad copy.
-                </p>
-                <button
-                  onClick={createAdsCampaign}
-                  disabled={loading_ads}
+                  </p>
+                  <button
+                    onClick={createAdsCampaign}
+                    disabled={loading_ads}
                   className="w-full bg-cyan-600 text-white py-2 px-3 rounded-md hover:bg-cyan-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  {loading_ads ? 'Creating...' : 'Create Campaign'}
-                </button>
-              </div>
+                  >
+                    {loading_ads ? 'Creating...' : 'Create Campaign'}
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-cyan-200">
                 <h3 className="font-bold text-cyan-800 mb-2 text-sm sm:text-base">🔧 Optimize Campaign</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   AI-powered optimization of existing campaigns for better performance and ROI.
-                </p>
-                <button
-                  onClick={optimizeAdsCampaign}
+                  </p>
+                  <button
+                    onClick={optimizeAdsCampaign}
                   className="w-full bg-emerald-600 text-white py-2 px-3 rounded-md hover:bg-emerald-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Optimize Existing
-                </button>
+                  >
+                    Optimize Existing
+                  </button>
               </div>
             </div>
           </div>
@@ -1891,9 +2002,9 @@ function App() {
           {/* Platform Testing & Status Section - NEW */}
           <div className="bg-gradient-to-br from-pink-50 to-rose-100 p-4 sm:p-6 rounded-lg shadow-md mb-6 sm:mb-8 border border-pink-200">
             <h2 className="text-xl sm:text-2xl font-bold text-pink-800 mb-4 flex items-center">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
               🧪 Platform Testing & Status
             </h2>
             
@@ -1901,91 +2012,91 @@ function App() {
               <strong>Monitor and test all social media integrations.</strong> Check API connections, test posting capabilities, 
               and ensure all platforms are properly configured and functioning.
             </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border border-pink-200">
                 <h3 className="font-bold text-pink-800 mb-2 text-sm sm:text-base">📊 Platform Status</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Check the status and health of all connected social media platforms.
-                </p>
-                <button
-                  onClick={getPlatformStatus}
-                  disabled={loading_platform}
+                  </p>
+                  <button
+                    onClick={getPlatformStatus}
+                    disabled={loading_platform}
                   className="w-full bg-pink-600 text-white py-2 px-3 rounded-md hover:bg-pink-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  {loading_platform ? 'Checking...' : 'Check Status'}
-                </button>
-              </div>
+                  >
+                    {loading_platform ? 'Checking...' : 'Check Status'}
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-pink-200">
                 <h3 className="font-bold text-pink-800 mb-2 text-sm sm:text-base">🐦 Test Twitter</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Test Twitter API connection and posting capabilities.
-                </p>
-                <button
-                  onClick={() => testPlatform('twitter')}
+                  </p>
+                  <button
+                    onClick={() => testPlatform('twitter')}
                   className="w-full bg-blue-500 text-white py-2 px-3 rounded-md hover:bg-blue-600 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Test Twitter
-                </button>
-              </div>
+                  >
+                    Test Twitter
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-pink-200">
                 <h3 className="font-bold text-pink-800 mb-2 text-sm sm:text-base">📘 Test Facebook</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Test Facebook API connection and posting capabilities.
-                </p>
-                <button
-                  onClick={() => testPlatform('facebook')}
+                  </p>
+                  <button
+                    onClick={() => testPlatform('facebook')}
                   className="w-full bg-blue-700 text-white py-2 px-3 rounded-md hover:bg-blue-800 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Test Facebook
-                </button>
-              </div>
+                  >
+                    Test Facebook
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-pink-200">
                 <h3 className="font-bold text-pink-800 mb-2 text-sm sm:text-base">📷 Test Instagram</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Test Instagram API connection and posting capabilities.
-                </p>
-                <button
-                  onClick={() => testPlatform('instagram')}
+                  </p>
+                  <button
+                    onClick={() => testPlatform('instagram')}
                   className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-2 px-3 rounded-md hover:from-purple-600 hover:to-pink-600 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Test Instagram
-                </button>
-              </div>
+                  >
+                    Test Instagram
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-pink-200">
                 <h3 className="font-bold text-pink-800 mb-2 text-sm sm:text-base">📌 Test Pinterest</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Test Pinterest API connection and posting capabilities.
-                </p>
-                <button
-                  onClick={() => testPlatform('pinterest')}
+                  </p>
+                  <button
+                    onClick={() => testPlatform('pinterest')}
                   className="w-full bg-red-600 text-white py-2 px-3 rounded-md hover:bg-red-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Test Pinterest
-                </button>
-              </div>
+                  >
+                    Test Pinterest
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-pink-200">
                 <h3 className="font-bold text-pink-800 mb-2 text-sm sm:text-base">📊 Analytics</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Get comprehensive marketing metrics and social media attribution data.
                 </p>
-                <button
-                  onClick={getMarketingMetrics}
+                    <button
+                      onClick={getMarketingMetrics}
                   className="w-full bg-emerald-600 text-white py-2 px-3 rounded-md hover:bg-emerald-700 transition duration-150 ease-in-out text-xs sm:text-sm mb-2"
-                >
-                  Marketing Metrics
-                </button>
-                <button
-                  onClick={getSocialAttribution}
+                    >
+                      Marketing Metrics
+                    </button>
+                    <button
+                      onClick={getSocialAttribution}
                   className="w-full bg-teal-600 text-white py-2 px-3 rounded-md hover:bg-teal-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Social Attribution
-                </button>
+                    >
+                      Social Attribution
+                    </button>
               </div>
             </div>
           </div>
@@ -1993,10 +2104,10 @@ function App() {
           {/* Settings and Reports Section - NEW */}
           <div className="bg-gradient-to-br from-gray-50 to-slate-100 p-4 sm:p-6 rounded-lg shadow-md mb-6 sm:mb-8 border border-gray-200">
             <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 flex items-center">
-              <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
               ⚙️ Settings & Reports
             </h2>
             
@@ -2004,533 +2115,533 @@ function App() {
               <strong>Configure your system and generate reports.</strong> Set up API keys, adjust marketing settings, 
               and generate comprehensive performance reports.
             </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <h3 className="font-bold text-gray-800 mb-2 text-sm sm:text-base">🚀 Setup Guide</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Complete step-by-step setup guide with API key instructions and links.
-                </p>
-                <button
-                  onClick={showOnboardingManually}
+                  </p>
+                  <button
+                    onClick={showOnboardingManually}
                   className="w-full bg-purple-600 text-white py-2 px-3 rounded-md hover:bg-purple-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Open Setup Guide
-                </button>
-              </div>
+                  >
+                    Open Setup Guide
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <h3 className="font-bold text-gray-800 mb-2 text-sm sm:text-base">⚙️ API Settings</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Configure API keys, credentials, and system settings for all platforms and services.
-                </p>
-                <button
-                  onClick={() => setShowConfigSettingsModal(true)}
+                  </p>
+                  <button
+                    onClick={() => setShowConfigSettingsModal(true)}
                   className="w-full bg-gray-600 text-white py-2 px-3 rounded-md hover:bg-gray-700 transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  Open Settings
-                </button>
-              </div>
+                  >
+                    Open Settings
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <h3 className="font-bold text-gray-800 mb-2 text-sm sm:text-base">📊 Weekly Report</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Generate comprehensive weekly performance reports with insights and recommendations.
-                </p>
-                <button
-                  onClick={generateWeeklyReport}
-                  disabled={loading_report}
+                  </p>
+                  <button
+                    onClick={generateWeeklyReport}
+                    disabled={loading_report}
                   className="w-full bg-indigo-600 text-white py-2 px-3 rounded-md hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-150 ease-in-out text-xs sm:text-sm"
-                >
-                  {loading_report ? 'Generating...' : 'Generate Report'}
-                </button>
-              </div>
+                  >
+                    {loading_report ? 'Generating...' : 'Generate Report'}
+                  </button>
+                </div>
 
               <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <h3 className="font-bold text-gray-800 mb-2 text-sm sm:text-base">📚 Book Settings</h3>
                 <p className="text-xs sm:text-sm text-gray-600 mb-3">
                   Edit book information, target audience, and marketing preferences.
-                </p>
-                <button
-                  onClick={() => setShowSettingsModal(true)}
+                  </p>
+                  <button
+                    onClick={() => setShowSettingsModal(true)}
                   className="w-full bg-blue-600 text-white py-2 px-3 rounded-md hover:bg-blue-700 transition duration-150 ease-in-out text-xs sm:text-sm"
+                  >
+                    Edit Book Settings
+                  </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Custom Modal - using the imported CustomModal component */}
+      {showModal && <CustomModal message={modalMessage} onClose={() => setShowModal(false)} />}
+
+      {/* Edit Modal - using the enhanced CustomModal component for post editing */}
+      {showEditModal && (
+        <CustomModal
+          title="Edit Post Content"
+          onClose={() => {
+            setShowEditModal(false);
+            setEditingPost(null);
+            setEditContent('');
+          }}
+          showCloseButton={false}
+        >
+          {/* Edit form content */}
+          <div>
+            {/* Platform indicator */}
+            <div className="mb-3">
+              <span className="text-sm font-semibold text-gray-700">Platform: </span>
+              <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                {editingPost?.platform || 'Unknown'}
+              </span>
+            </div>
+            
+            {/* Content editing textarea */}
+            <label htmlFor="edit-content" className="block text-sm font-semibold text-gray-700 mb-2">
+              Post Content:
+            </label>
+            <textarea
+              id="edit-content"
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="w-full h-32 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
+              placeholder="Enter your post content here..."
+              maxLength={2000}
+            />
+            
+            {/* Character count */}
+            <div className="text-right text-xs text-gray-500 mt-1">
+              {editContent.length}/2000 characters
+            </div>
+            
+            {/* Action buttons */}
+            <div className="mt-6 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+              <button
+                onClick={saveEditedPost}
+                disabled={!editContent.trim()}
+                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingPost(null);
+                  setEditContent('');
+                }}
+                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </CustomModal>
+      )}
+
+      {/* Settings Modal - using the enhanced CustomModal component for settings editing */}
+      {showSettingsModal && (
+        <CustomModal
+          title="Book Settings"
+          onClose={() => {
+            setShowSettingsModal(false);
+            setEditingSettings({});
+          }}
+          showCloseButton={false}
+        >
+          {/* Settings form content */}
+          <div>
+            {/* Form fields for editing settings */}
+            <div className="mb-4">
+              <label htmlFor="bookTitle" className="block text-sm font-semibold text-gray-700 mb-2">
+                Title:
+              </label>
+              <input
+                id="bookTitle"
+                value={editingSettings.bookTitle}
+                onChange={(e) => handleSettingsChange('bookTitle', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="bookAuthor" className="block text-sm font-semibold text-gray-700 mb-2">
+                Author:
+              </label>
+              <input
+                id="bookAuthor"
+                value={editingSettings.bookAuthor}
+                onChange={(e) => handleSettingsChange('bookAuthor', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="amazonLink" className="block text-sm font-semibold text-gray-700 mb-2">
+                Amazon Link:
+              </label>
+              <input
+                id="amazonLink"
+                value={editingSettings.amazonLink}
+                onChange={(e) => handleSettingsChange('amazonLink', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="audibleLink" className="block text-sm font-semibold text-gray-700 mb-2">
+                Audible Link:
+              </label>
+              <input
+                id="audibleLink"
+                value={editingSettings.audibleLink}
+                onChange={(e) => handleSettingsChange('audibleLink', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="landingPageUrl" className="block text-sm font-semibold text-gray-700 mb-2">
+                Landing Page:
+              </label>
+              <input
+                id="landingPageUrl"
+                value={editingSettings.landingPageUrl}
+                onChange={(e) => handleSettingsChange('landingPageUrl', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="monthlyBudget" className="block text-sm font-semibold text-gray-700 mb-2">
+                Monthly Budget:
+              </label>
+              <input
+                id="monthlyBudget"
+                type="number"
+                value={editingSettings.monthlyBudget}
+                onChange={(e) => handleSettingsChange('monthlyBudget', Number(e.target.value))}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="contentGuidelines" className="block text-sm font-semibold text-gray-700 mb-2">
+                Content Guidelines:
+              </label>
+              <textarea
+                id="contentGuidelines"
+                value={editingSettings.contentGuidelines}
+                onChange={(e) => handleSettingsChange('contentGuidelines', e.target.value)}
+                className="w-full h-32 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter content guidelines here..."
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="humanInLoopEnabled" className="block text-sm font-semibold text-gray-700 mb-2">
+                Human-in-Loop:
+              </label>
+              <input
+                id="humanInLoopEnabled"
+                type="checkbox"
+                checked={editingSettings.humanInLoopEnabled}
+                onChange={(e) => handleSettingsChange('humanInLoopEnabled', e.target.checked)}
+                className="form-checkbox h-5 w-5 text-blue-600"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="targetAudience" className="block text-sm font-semibold text-gray-700 mb-2">
+                Target Audience:
+              </label>
+              <input
+                id="targetAudience"
+                value={editingSettings.targetAudience}
+                onChange={(e) => handleSettingsChange('targetAudience', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="bookGenre" className="block text-sm font-semibold text-gray-700 mb-2">
+                Genre:
+              </label>
+              <input
+                id="bookGenre"
+                value={editingSettings.bookGenre}
+                onChange={(e) => handleSettingsChange('bookGenre', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="keyThemes" className="block text-sm font-semibold text-gray-700 mb-2">
+                Key Themes:
+              </label>
+              <input
+                id="keyThemes"
+                value={editingSettings.keyThemes}
+                onChange={(e) => handleSettingsChange('keyThemes', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="marketingTone" className="block text-sm font-semibold text-gray-700 mb-2">
+                Marketing Tone:
+              </label>
+              <input
+                id="marketingTone"
+                value={editingSettings.marketingTone}
+                onChange={(e) => handleSettingsChange('marketingTone', e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            
+            {/* Action buttons */}
+            <div className="mt-6 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+              <button
+                onClick={saveEditedSettings}
+                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                Save Changes
+              </button>
+              <button
+                onClick={() => {
+                  setShowSettingsModal(false);
+                  setEditingSettings({});
+                }}
+                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </CustomModal>
+      )}
+
+      {/* Revenue Analysis Modal - displays detailed revenue performance analysis */}
+      {showRevenueModal && revenueAnalysis && (
+        <CustomModal
+          title="📊 Revenue Performance Analysis"
+          onClose={() => setShowRevenueModal(false)}
+          showCloseButton={true}
+        >
+          <div className="space-y-4">
+            {/* Current Metrics Section */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-bold text-blue-800 mb-2">📈 Current Metrics</h3>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div><span className="font-semibold">Monthly Sales:</span> ${revenueAnalysis.current_metrics?.monthly_sales?.toFixed(2) || 'N/A'}</div>
+                <div><span className="font-semibold">Growth Rate:</span> {(revenueAnalysis.current_metrics?.growth_rate * 100)?.toFixed(1) || 'N/A'}%</div>
+                <div><span className="font-semibold">Conversion Rate:</span> {(revenueAnalysis.current_metrics?.conversion_rate * 100)?.toFixed(2) || 'N/A'}%</div>
+                <div><span className="font-semibold">AOV:</span> ${revenueAnalysis.current_metrics?.average_order_value?.toFixed(2) || 'N/A'}</div>
+              </div>
+            </div>
+
+            {/* Growth Opportunities Section */}
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-bold text-green-800 mb-2">🚀 Growth Opportunities</h3>
+              <div className="text-sm">
+                {revenueAnalysis.growth_opportunities ? (
+                  <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(revenueAnalysis.growth_opportunities, null, 2)}</pre>
+                ) : (
+                  <p className="text-gray-600">AI is analyzing growth opportunities...</p>
+                )}
+              </div>
+            </div>
+
+            {/* AI Recommendations Section */}
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <h3 className="font-bold text-yellow-800 mb-2">🤖 AI Recommendations</h3>
+              <div className="text-sm">
+                {revenueAnalysis.ai_recommendations ? (
+                  <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(revenueAnalysis.ai_recommendations, null, 2)}</pre>
+                ) : (
+                  <p className="text-gray-600">Generating AI recommendations...</p>
+                )}
+              </div>
+            </div>
+
+            {/* Growth Projections Section */}
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="font-bold text-purple-800 mb-2">📊 Growth Projections</h3>
+              <div className="text-sm">
+                {revenueAnalysis.growth_projections ? (
+                  <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(revenueAnalysis.growth_projections, null, 2)}</pre>
+                ) : (
+                  <p className="text-gray-600">Calculating growth projections...</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </CustomModal>
+      )}
+
+      {/* Performance Analytics Modal - displays detailed content performance analysis */}
+      {showAnalyticsModal && performanceData && (
+        <CustomModal
+          title="📈 Performance Analytics"
+          onClose={() => setShowAnalyticsModal(false)}
+          showCloseButton={true}
+        >
+          <div className="space-y-4">
+            {/* Performance Metrics Section */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-bold text-blue-800 mb-2">📊 Performance Metrics</h3>
+              <div className="text-sm">
+                {performanceData.performance_metrics ? (
+                  <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(performanceData.performance_metrics, null, 2)}</pre>
+                ) : (
+                  <p className="text-gray-600">Analyzing performance metrics...</p>
+                )}
+              </div>
+            </div>
+
+            {/* Top Performing Patterns Section */}
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-bold text-green-800 mb-2">🏆 Top Performing Patterns</h3>
+              <div className="text-sm">
+                {performanceData.top_performing_patterns ? (
+                  <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(performanceData.top_performing_patterns, null, 2)}</pre>
+                ) : (
+                  <p className="text-gray-600">Identifying successful patterns...</p>
+                )}
+              </div>
+            </div>
+
+            {/* AI Insights Section */}
+            <div className="bg-yellow-50 p-4 rounded-lg">
+              <h3 className="font-bold text-yellow-800 mb-2">🤖 AI Insights</h3>
+              <div className="text-sm">
+                {performanceData.ai_insights ? (
+                  <p className="whitespace-pre-wrap text-gray-700">{performanceData.ai_insights}</p>
+                ) : (
+                  <p className="text-gray-600">Generating AI insights...</p>
+                )}
+              </div>
+            </div>
+
+            {/* Optimization Recommendations Section */}
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="font-bold text-purple-800 mb-2">⚡ Optimization Recommendations</h3>
+              <div className="text-sm">
+                {performanceData.optimization_recommendations ? (
+                  <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(performanceData.optimization_recommendations, null, 2)}</pre>
+                ) : (
+                  <p className="text-gray-600">Creating optimization strategies...</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </CustomModal>
+      )}
+
+      {/* Pricing Optimization Modal - displays pricing strategy recommendations */}
+      {showPricingModal && pricingOptimization && (
+        <CustomModal
+          title="💰 Pricing Optimization"
+          onClose={() => setShowPricingModal(false)}
+          showCloseButton={true}
+        >
+          <div className="space-y-4">
+            {/* Pricing Analysis Section */}
+            <div className="bg-amber-50 p-4 rounded-lg">
+              <h3 className="font-bold text-amber-800 mb-2">📊 Pricing Analysis</h3>
+              <div className="text-sm">
+                {pricingOptimization.pricing_analysis ? (
+                  <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(pricingOptimization.pricing_analysis, null, 2)}</pre>
+                ) : (
+                  <p className="text-gray-600">Analyzing current pricing effectiveness...</p>
+                )}
+              </div>
+            </div>
+
+            {/* AI Recommendations Section */}
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-bold text-green-800 mb-2">🤖 AI Pricing Recommendations</h3>
+              <div className="text-sm">
+                {pricingOptimization.ai_recommendations ? (
+                  <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(pricingOptimization.ai_recommendations, null, 2)}</pre>
+                ) : (
+                  <p className="text-gray-600">Generating pricing strategies...</p>
+                )}
+              </div>
+            </div>
+
+            {/* Implementation Priority Section */}
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-bold text-blue-800 mb-2">🎯 Implementation Priority</h3>
+              <div className="text-sm">
+                {pricingOptimization.implementation_priority ? (
+                  <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(pricingOptimization.implementation_priority, null, 2)}</pre>
+                ) : (
+                  <p className="text-gray-600">Prioritizing pricing actions...</p>
+                )}
+              </div>
+            </div>
+
+            {/* Expected Impact Section */}
+            <div className="bg-purple-50 p-4 rounded-lg">
+              <h3 className="font-bold text-purple-800 mb-2">📈 Expected Impact</h3>
+              <div className="text-sm">
+                <p><span className="font-semibold">Revenue Impact:</span> {pricingOptimization.expected_impact ? `${(pricingOptimization.expected_impact * 100).toFixed(1)}%` : 'Calculating...'}</p>
+              </div>
+            </div>
+          </div>
+        </CustomModal>
+      )}
+
+      {/* A/B Testing Modal - displays active and completed tests */}
+      {showABTestModal && (
+        <CustomModal
+          title="🧪 A/B Testing Dashboard"
+          onClose={() => setShowABTestModal(false)}
+          showCloseButton={true}
+        >
+          <div className="space-y-4">
+            <div className="bg-indigo-50 p-4 rounded-lg">
+              <h3 className="font-bold text-indigo-800 mb-2">📊 Active Tests</h3>
+              {abTestResults.length > 0 ? (
+                abTestResults.map((test, index) => (
+                  <div key={index} className="mb-4 p-3 bg-white rounded border">
+                    <div className="text-sm">
+                      <div><span className="font-semibold">Test ID:</span> {test.test_id}</div>
+                      <div><span className="font-semibold">Variants:</span> {test.variants?.length || 0}</div>
+                      <div><span className="font-semibold">Expected Duration:</span> {test.expected_duration || 'N/A'}</div>
+                      <div><span className="font-semibold">Status:</span> 
+                        <span className="ml-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">Running</span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-600 text-sm">No active A/B tests. Create one to start optimizing!</p>
+              )}
+            </div>
+
+            {/* Quick Test Setup */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <h3 className="font-bold text-gray-800 mb-2">⚡ Quick Test Setup</h3>
+              <div className="space-y-2">
+                <button
+                  onClick={() => setupABTest("Mental toughness training for young athletes", "headline", ["instagram", "facebook"])}
+                  className="w-full text-left p-2 bg-white rounded border hover:bg-blue-50 text-sm"
                 >
-                  Edit Book Settings
+                  🏆 Test Headlines for Sports Content
+                </button>
+                <button
+                  onClick={() => setupABTest("Overcome challenges and build confidence", "tone", ["instagram", "twitter"])}
+                  className="w-full text-left p-2 bg-white rounded border hover:bg-blue-50 text-sm"
+                >
+                  🎯 Test Content Tone Variations
+                </button>
+                <button
+                  onClick={() => setupABTest("Get your copy today!", "call_to_action", ["facebook", "instagram"])}
+                  className="w-full text-left p-2 bg-white rounded border hover:bg-blue-50 text-sm"
+                >
+                  📢 Test Call-to-Action Phrases
                 </button>
               </div>
             </div>
           </div>
-        </div>
+        </CustomModal>
+      )}
 
-        {/* Custom Modal - using the imported CustomModal component */}
-        {showModal && <CustomModal message={modalMessage} onClose={() => setShowModal(false)} />}
-
-        {/* Edit Modal - using the enhanced CustomModal component for post editing */}
-        {showEditModal && (
-          <CustomModal
-            title="Edit Post Content"
-            onClose={() => {
-              setShowEditModal(false);
-              setEditingPost(null);
-              setEditContent('');
-            }}
-            showCloseButton={false}
-          >
-            {/* Edit form content */}
-            <div>
-              {/* Platform indicator */}
-              <div className="mb-3">
-                <span className="text-sm font-semibold text-gray-700">Platform: </span>
-                <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                  {editingPost?.platform || 'Unknown'}
-                </span>
-              </div>
-              
-              {/* Content editing textarea */}
-              <label htmlFor="edit-content" className="block text-sm font-semibold text-gray-700 mb-2">
-                Post Content:
-              </label>
-              <textarea
-                id="edit-content"
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-                className="w-full h-32 p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-vertical"
-                placeholder="Enter your post content here..."
-                maxLength={2000}
-              />
-              
-              {/* Character count */}
-              <div className="text-right text-xs text-gray-500 mt-1">
-                {editContent.length}/2000 characters
-              </div>
-              
-              {/* Action buttons */}
-              <div className="mt-6 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                <button
-                  onClick={saveEditedPost}
-                  disabled={!editContent.trim()}
-                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Save Changes
-                </button>
-                <button
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setEditingPost(null);
-                    setEditContent('');
-                  }}
-                  className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </CustomModal>
-        )}
-
-        {/* Settings Modal - using the enhanced CustomModal component for settings editing */}
-        {showSettingsModal && (
-          <CustomModal
-            title="Book Settings"
-            onClose={() => {
-              setShowSettingsModal(false);
-              setEditingSettings({});
-            }}
-            showCloseButton={false}
-          >
-            {/* Settings form content */}
-            <div>
-              {/* Form fields for editing settings */}
-              <div className="mb-4">
-                <label htmlFor="bookTitle" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Title:
-                </label>
-                <input
-                  id="bookTitle"
-                  value={editingSettings.bookTitle}
-                  onChange={(e) => handleSettingsChange('bookTitle', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="bookAuthor" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Author:
-                </label>
-                <input
-                  id="bookAuthor"
-                  value={editingSettings.bookAuthor}
-                  onChange={(e) => handleSettingsChange('bookAuthor', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="amazonLink" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Amazon Link:
-                </label>
-                <input
-                  id="amazonLink"
-                  value={editingSettings.amazonLink}
-                  onChange={(e) => handleSettingsChange('amazonLink', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="audibleLink" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Audible Link:
-                </label>
-                <input
-                  id="audibleLink"
-                  value={editingSettings.audibleLink}
-                  onChange={(e) => handleSettingsChange('audibleLink', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="landingPageUrl" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Landing Page:
-                </label>
-                <input
-                  id="landingPageUrl"
-                  value={editingSettings.landingPageUrl}
-                  onChange={(e) => handleSettingsChange('landingPageUrl', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="monthlyBudget" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Monthly Budget:
-                </label>
-                <input
-                  id="monthlyBudget"
-                  type="number"
-                  value={editingSettings.monthlyBudget}
-                  onChange={(e) => handleSettingsChange('monthlyBudget', Number(e.target.value))}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="contentGuidelines" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Content Guidelines:
-                </label>
-                <textarea
-                  id="contentGuidelines"
-                  value={editingSettings.contentGuidelines}
-                  onChange={(e) => handleSettingsChange('contentGuidelines', e.target.value)}
-                  className="w-full h-32 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter content guidelines here..."
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="humanInLoopEnabled" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Human-in-Loop:
-                </label>
-                <input
-                  id="humanInLoopEnabled"
-                  type="checkbox"
-                  checked={editingSettings.humanInLoopEnabled}
-                  onChange={(e) => handleSettingsChange('humanInLoopEnabled', e.target.checked)}
-                  className="form-checkbox h-5 w-5 text-blue-600"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="targetAudience" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Target Audience:
-                </label>
-                <input
-                  id="targetAudience"
-                  value={editingSettings.targetAudience}
-                  onChange={(e) => handleSettingsChange('targetAudience', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="bookGenre" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Genre:
-                </label>
-                <input
-                  id="bookGenre"
-                  value={editingSettings.bookGenre}
-                  onChange={(e) => handleSettingsChange('bookGenre', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="keyThemes" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Key Themes:
-                </label>
-                <input
-                  id="keyThemes"
-                  value={editingSettings.keyThemes}
-                  onChange={(e) => handleSettingsChange('keyThemes', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="marketingTone" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Marketing Tone:
-                </label>
-                <input
-                  id="marketingTone"
-                  value={editingSettings.marketingTone}
-                  onChange={(e) => handleSettingsChange('marketingTone', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-              </div>
-              
-              {/* Action buttons */}
-              <div className="mt-6 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-                <button
-                  onClick={saveEditedSettings}
-                  className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Save Changes
-                </button>
-                <button
-                  onClick={() => {
-                    setShowSettingsModal(false);
-                    setEditingSettings({});
-                  }}
-                  className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-600 transition duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-gray-500"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </CustomModal>
-        )}
-
-        {/* Revenue Analysis Modal - displays detailed revenue performance analysis */}
-        {showRevenueModal && revenueAnalysis && (
-          <CustomModal
-            title="📊 Revenue Performance Analysis"
-            onClose={() => setShowRevenueModal(false)}
-            showCloseButton={true}
-          >
-            <div className="space-y-4">
-              {/* Current Metrics Section */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-bold text-blue-800 mb-2">📈 Current Metrics</h3>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div><span className="font-semibold">Monthly Sales:</span> ${revenueAnalysis.current_metrics?.monthly_sales?.toFixed(2) || 'N/A'}</div>
-                  <div><span className="font-semibold">Growth Rate:</span> {(revenueAnalysis.current_metrics?.growth_rate * 100)?.toFixed(1) || 'N/A'}%</div>
-                  <div><span className="font-semibold">Conversion Rate:</span> {(revenueAnalysis.current_metrics?.conversion_rate * 100)?.toFixed(2) || 'N/A'}%</div>
-                  <div><span className="font-semibold">AOV:</span> ${revenueAnalysis.current_metrics?.average_order_value?.toFixed(2) || 'N/A'}</div>
-                </div>
-              </div>
-
-              {/* Growth Opportunities Section */}
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h3 className="font-bold text-green-800 mb-2">🚀 Growth Opportunities</h3>
-                <div className="text-sm">
-                  {revenueAnalysis.growth_opportunities ? (
-                    <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(revenueAnalysis.growth_opportunities, null, 2)}</pre>
-                  ) : (
-                    <p className="text-gray-600">AI is analyzing growth opportunities...</p>
-                  )}
-                </div>
-              </div>
-
-              {/* AI Recommendations Section */}
-              <div className="bg-yellow-50 p-4 rounded-lg">
-                <h3 className="font-bold text-yellow-800 mb-2">🤖 AI Recommendations</h3>
-                <div className="text-sm">
-                  {revenueAnalysis.ai_recommendations ? (
-                    <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(revenueAnalysis.ai_recommendations, null, 2)}</pre>
-                  ) : (
-                    <p className="text-gray-600">Generating AI recommendations...</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Growth Projections Section */}
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h3 className="font-bold text-purple-800 mb-2">📊 Growth Projections</h3>
-                <div className="text-sm">
-                  {revenueAnalysis.growth_projections ? (
-                    <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(revenueAnalysis.growth_projections, null, 2)}</pre>
-                  ) : (
-                    <p className="text-gray-600">Calculating growth projections...</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </CustomModal>
-        )}
-
-        {/* Performance Analytics Modal - displays detailed content performance analysis */}
-        {showAnalyticsModal && performanceData && (
-          <CustomModal
-            title="📈 Performance Analytics"
-            onClose={() => setShowAnalyticsModal(false)}
-            showCloseButton={true}
-          >
-            <div className="space-y-4">
-              {/* Performance Metrics Section */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-bold text-blue-800 mb-2">📊 Performance Metrics</h3>
-                <div className="text-sm">
-                  {performanceData.performance_metrics ? (
-                    <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(performanceData.performance_metrics, null, 2)}</pre>
-                  ) : (
-                    <p className="text-gray-600">Analyzing performance metrics...</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Top Performing Patterns Section */}
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h3 className="font-bold text-green-800 mb-2">🏆 Top Performing Patterns</h3>
-                <div className="text-sm">
-                  {performanceData.top_performing_patterns ? (
-                    <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(performanceData.top_performing_patterns, null, 2)}</pre>
-                  ) : (
-                    <p className="text-gray-600">Identifying successful patterns...</p>
-                  )}
-                </div>
-              </div>
-
-              {/* AI Insights Section */}
-              <div className="bg-yellow-50 p-4 rounded-lg">
-                <h3 className="font-bold text-yellow-800 mb-2">🤖 AI Insights</h3>
-                <div className="text-sm">
-                  {performanceData.ai_insights ? (
-                    <p className="whitespace-pre-wrap text-gray-700">{performanceData.ai_insights}</p>
-                  ) : (
-                    <p className="text-gray-600">Generating AI insights...</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Optimization Recommendations Section */}
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h3 className="font-bold text-purple-800 mb-2">⚡ Optimization Recommendations</h3>
-                <div className="text-sm">
-                  {performanceData.optimization_recommendations ? (
-                    <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(performanceData.optimization_recommendations, null, 2)}</pre>
-                  ) : (
-                    <p className="text-gray-600">Creating optimization strategies...</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </CustomModal>
-        )}
-
-        {/* Pricing Optimization Modal - displays pricing strategy recommendations */}
-        {showPricingModal && pricingOptimization && (
-          <CustomModal
-            title="💰 Pricing Optimization"
-            onClose={() => setShowPricingModal(false)}
-            showCloseButton={true}
-          >
-            <div className="space-y-4">
-              {/* Pricing Analysis Section */}
-              <div className="bg-amber-50 p-4 rounded-lg">
-                <h3 className="font-bold text-amber-800 mb-2">📊 Pricing Analysis</h3>
-                <div className="text-sm">
-                  {pricingOptimization.pricing_analysis ? (
-                    <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(pricingOptimization.pricing_analysis, null, 2)}</pre>
-                  ) : (
-                    <p className="text-gray-600">Analyzing current pricing effectiveness...</p>
-                  )}
-                </div>
-              </div>
-
-              {/* AI Recommendations Section */}
-              <div className="bg-green-50 p-4 rounded-lg">
-                <h3 className="font-bold text-green-800 mb-2">🤖 AI Pricing Recommendations</h3>
-                <div className="text-sm">
-                  {pricingOptimization.ai_recommendations ? (
-                    <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(pricingOptimization.ai_recommendations, null, 2)}</pre>
-                  ) : (
-                    <p className="text-gray-600">Generating pricing strategies...</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Implementation Priority Section */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h3 className="font-bold text-blue-800 mb-2">🎯 Implementation Priority</h3>
-                <div className="text-sm">
-                  {pricingOptimization.implementation_priority ? (
-                    <pre className="whitespace-pre-wrap text-gray-700">{JSON.stringify(pricingOptimization.implementation_priority, null, 2)}</pre>
-                  ) : (
-                    <p className="text-gray-600">Prioritizing pricing actions...</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Expected Impact Section */}
-              <div className="bg-purple-50 p-4 rounded-lg">
-                <h3 className="font-bold text-purple-800 mb-2">📈 Expected Impact</h3>
-                <div className="text-sm">
-                  <p><span className="font-semibold">Revenue Impact:</span> {pricingOptimization.expected_impact ? `${(pricingOptimization.expected_impact * 100).toFixed(1)}%` : 'Calculating...'}</p>
-                </div>
-              </div>
-            </div>
-          </CustomModal>
-        )}
-
-        {/* A/B Testing Modal - displays active and completed tests */}
-        {showABTestModal && (
-          <CustomModal
-            title="🧪 A/B Testing Dashboard"
-            onClose={() => setShowABTestModal(false)}
-            showCloseButton={true}
-          >
-            <div className="space-y-4">
-              <div className="bg-indigo-50 p-4 rounded-lg">
-                <h3 className="font-bold text-indigo-800 mb-2">📊 Active Tests</h3>
-                {abTestResults.length > 0 ? (
-                  abTestResults.map((test, index) => (
-                    <div key={index} className="mb-4 p-3 bg-white rounded border">
-                      <div className="text-sm">
-                        <div><span className="font-semibold">Test ID:</span> {test.test_id}</div>
-                        <div><span className="font-semibold">Variants:</span> {test.variants?.length || 0}</div>
-                        <div><span className="font-semibold">Expected Duration:</span> {test.expected_duration || 'N/A'}</div>
-                        <div><span className="font-semibold">Status:</span> 
-                          <span className="ml-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">Running</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-600 text-sm">No active A/B tests. Create one to start optimizing!</p>
-                )}
-              </div>
-
-              {/* Quick Test Setup */}
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h3 className="font-bold text-gray-800 mb-2">⚡ Quick Test Setup</h3>
-                <div className="space-y-2">
-                  <button
-                    onClick={() => setupABTest("Mental toughness training for young athletes", "headline", ["instagram", "facebook"])}
-                    className="w-full text-left p-2 bg-white rounded border hover:bg-blue-50 text-sm"
-                  >
-                    🏆 Test Headlines for Sports Content
-                  </button>
-                  <button
-                    onClick={() => setupABTest("Overcome challenges and build confidence", "tone", ["instagram", "twitter"])}
-                    className="w-full text-left p-2 bg-white rounded border hover:bg-blue-50 text-sm"
-                  >
-                    🎯 Test Content Tone Variations
-                  </button>
-                  <button
-                    onClick={() => setupABTest("Get your copy today!", "call_to_action", ["facebook", "instagram"])}
-                    className="w-full text-left p-2 bg-white rounded border hover:bg-blue-50 text-sm"
-                  >
-                    📢 Test Call-to-Action Phrases
-                  </button>
-                </div>
-              </div>
-            </div>
-          </CustomModal>
-        )}
-
-        {/* Comprehensive Settings Modal - NEW */}
-        <Settings
-          isOpen={showConfigSettingsModal}
-          onClose={() => setShowConfigSettingsModal(false)}
+      {/* Comprehensive Settings Modal - NEW */}
+      <Settings
+        isOpen={showConfigSettingsModal}
+        onClose={() => setShowConfigSettingsModal(false)}
           firebaseServices={{ db, auth }}
           userId={userId}
           onSettingsUpdate={(newSettings) => {
@@ -2552,3 +2663,4 @@ function App() {
 }
 
 export default App; 
+

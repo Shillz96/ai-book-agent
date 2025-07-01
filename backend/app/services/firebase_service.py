@@ -14,8 +14,9 @@ logger = logging.getLogger(__name__)
 
 class FirebaseService:
     """
-    Service class to handle all Firebase Firestore operations.
-    Manages user settings, posts, and other data storage.
+    Production Firebase Firestore service for managing user data and settings.
+    This service handles all Firebase operations with proper error handling
+    and production-grade security.
     """
     
     _instance = None
@@ -28,44 +29,43 @@ class FirebaseService:
         return cls._instance
 
     def __init__(self):
-        """Initialize the Firebase service."""
+        """Initialize the Firebase service with production configurations."""
         if not self._initialized:
             self._initialize_firebase()
             FirebaseService._initialized = True
 
     def _initialize_firebase(self):
-        """Initialize Firebase with credentials."""
+        """
+        Initialize Firebase with production credentials.
+        Uses service account credentials for secure production access.
+        """
         try:
-            # For testing, use emulator if available
-            if os.getenv('FIRESTORE_EMULATOR_HOST'):
-                os.environ['FIREBASE_AUTH_EMULATOR_HOST'] = 'localhost:9099'
-                cred = credentials.Certificate({
-                    'type': 'service_account',
-                    'project_id': 'test-project',
-                    'private_key_id': 'test-key-id',
-                    'private_key': '-----BEGIN PRIVATE KEY-----\ntest\n-----END PRIVATE KEY-----\n',
-                    'client_email': 'test@test-project.iam.gserviceaccount.com',
-                    'client_id': 'test-client-id',
-                    'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
-                    'token_uri': 'https://oauth2.googleapis.com/token',
-                    'auth_provider_x509_cert_url': 'https://www.googleapis.com/oauth2/v1/certs',
-                    'client_x509_cert_url': 'https://www.googleapis.com/robot/v1/metadata/x509/test'
-                })
-            else:
-                # In production, use service account credentials
-                cred = credentials.Certificate(
-                    os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-                )
-
+            # Get credentials path from environment variable
+            credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+            
+            if not credentials_path:
+                raise ValueError("GOOGLE_APPLICATION_CREDENTIALS environment variable not set")
+            
+            if not os.path.exists(credentials_path):
+                raise FileNotFoundError(f"Firebase credentials file not found: {credentials_path}")
+            
+            # Initialize Firebase with production service account
+            cred = credentials.Certificate(credentials_path)
             firebase_admin.initialize_app(cred)
+            
+            # Initialize Firestore client
             self.db = firestore.client()
+            
+            logger.info("Firebase initialized successfully with production credentials")
+            
         except Exception as e:
-            raise Exception(f"Error initializing Firebase: {str(e)}")
+            logger.error(f"Failed to initialize Firebase: {str(e)}")
+            raise Exception(f"Firebase initialization failed: {str(e)}")
 
     @property
     def initialized(self):
-        """Check if Firebase is initialized."""
-        return self._initialized
+        """Check if Firebase is properly initialized."""
+        return self._initialized and hasattr(self, 'db') and self.db is not None
 
     def get_user_settings(self, app_id: str, user_id: str) -> Optional[Dict[str, Any]]:
         """
@@ -243,4 +243,61 @@ class FirebaseService:
             
         except Exception as e:
             logger.error(f"Error saving performance data: {str(e)}")
+            return None
+
+    def save_ab_test(self, app_id: str, user_id: str, test_id: str, test_setup: Dict[str, Any]) -> Optional[str]:
+        """
+        Save A/B test configuration and setup data.
+        
+        Args:
+            app_id: Application ID
+            user_id: User ID
+            test_id: Unique test identifier
+            test_setup: A/B test configuration data
+            
+        Returns:
+            Document ID of saved test data or None if failed
+        """
+        try:
+            test_setup['timestamp'] = firestore.SERVER_TIMESTAMP
+            test_setup['test_id'] = test_id
+            
+            # Save to ab_tests collection
+            ab_tests_ref = self.db.collection('artifacts').document(app_id).collection('users').document(user_id).collection('ab_tests')
+            doc_ref = ab_tests_ref.document(test_id)
+            doc_ref.set(test_setup)
+            
+            logger.info(f"Saved A/B test {test_id} with ID: {test_id}")
+            return test_id
+            
+        except Exception as e:
+            logger.error(f"Error saving A/B test: {str(e)}")
+            return None
+
+    def get_ab_test_results(self, app_id: str, user_id: str, test_id: str) -> Optional[Dict[str, Any]]:
+        """
+        Retrieve A/B test results and data.
+        
+        Args:
+            app_id: Application ID
+            user_id: User ID
+            test_id: Test identifier
+            
+        Returns:
+            A/B test data dictionary or None if not found
+        """
+        try:
+            doc_ref = self.db.collection('artifacts').document(app_id).collection('users').document(user_id).collection('ab_tests').document(test_id)
+            doc = doc_ref.get()
+            
+            if doc.exists:
+                test_data = doc.to_dict()
+                logger.info(f"Retrieved A/B test data for test {test_id}")
+                return test_data
+            else:
+                logger.warning(f"A/B test {test_id} not found")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error retrieving A/B test: {str(e)}")
             return None 

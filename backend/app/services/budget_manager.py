@@ -586,4 +586,221 @@ class BudgetManager:
     def _calculate_forecast_confidence(self, spending_data: List[float], performance_data: List[Dict]) -> float:
         """Calculate forecast confidence based on data quality."""
         # Based on data consistency, sample size, etc.
-        return 0.75 
+        return 0.75
+
+    def calculate_efficiency_score(self, campaign_data: Dict) -> float:
+        """
+        Calculate real efficiency score based on actual campaign performance data.
+        
+        Args:
+            campaign_data: Real campaign performance data from advertising platforms
+            
+        Returns:
+            Efficiency score between 0 and 1
+        """
+        try:
+            # Extract key performance metrics
+            cost = campaign_data.get('cost', 0)
+            conversions = campaign_data.get('conversions', 0)
+            revenue = campaign_data.get('revenue', 0)
+            clicks = campaign_data.get('clicks', 0)
+            impressions = campaign_data.get('impressions', 0)
+            
+            # Calculate component scores
+            roi_score = self._calculate_roi_score(cost, revenue)
+            conversion_score = self._calculate_conversion_score(clicks, conversions)
+            cost_efficiency_score = self._calculate_cost_efficiency_score(campaign_data)
+            reach_score = self._calculate_reach_score(impressions, campaign_data.get('target_audience_size', 1))
+            
+            # Weight the scores based on business importance
+            weights = {
+                'roi': 0.4,           # ROI is most important
+                'conversion': 0.3,    # Conversion rate is critical
+                'cost_efficiency': 0.2, # Cost control matters
+                'reach': 0.1          # Reach is supporting metric
+            }
+            
+            efficiency_score = (
+                roi_score * weights['roi'] +
+                conversion_score * weights['conversion'] +
+                cost_efficiency_score * weights['cost_efficiency'] +
+                reach_score * weights['reach']
+            )
+            
+            return min(max(efficiency_score, 0.0), 1.0)  # Clamp between 0 and 1
+            
+        except Exception as e:
+            logger.error(f"Error calculating efficiency score: {str(e)}")
+            return 0.0
+
+    def predict_spend_forecast(self, historical_data: List[Dict], days_ahead: int = 30) -> float:
+        """
+        Predict future spend based on real historical spending patterns.
+        
+        Args:
+            historical_data: List of historical spending data points
+            days_ahead: Number of days to forecast ahead
+            
+        Returns:
+            Predicted spend amount
+        """
+        try:
+            if not historical_data or len(historical_data) < 7:
+                logger.warning("Insufficient historical data for forecast")
+                return 0.0
+            
+            # Extract spending values and dates
+            spends = [data.get('spend', 0) for data in historical_data]
+            dates = [datetime.fromisoformat(data.get('date')) for data in historical_data if data.get('date')]
+            
+            # Calculate trending patterns
+            recent_spends = spends[-7:]  # Last 7 days
+            avg_recent_spend = sum(recent_spends) / len(recent_spends)
+            
+            # Calculate growth rate
+            if len(spends) >= 14:
+                older_period = spends[-14:-7]  # Previous 7 days
+                avg_older_spend = sum(older_period) / len(older_period)
+                growth_rate = (avg_recent_spend - avg_older_spend) / avg_older_spend if avg_older_spend > 0 else 0
+            else:
+                growth_rate = 0
+            
+            # Account for seasonality (day of week patterns)
+            weekday_patterns = self._analyze_weekday_spending_patterns(historical_data)
+            
+            # Forecast future spend
+            base_daily_spend = avg_recent_spend
+            projected_spend = 0
+            
+            for day in range(days_ahead):
+                future_date = datetime.now() + timedelta(days=day)
+                weekday = future_date.weekday()
+                
+                # Apply weekday adjustment
+                weekday_multiplier = weekday_patterns.get(weekday, 1.0)
+                
+                # Apply growth trend
+                trend_multiplier = 1 + (growth_rate * (day / 30))  # Gradual application of growth
+                
+                daily_forecast = base_daily_spend * weekday_multiplier * trend_multiplier
+                projected_spend += daily_forecast
+            
+            return round(projected_spend, 2)
+            
+        except Exception as e:
+            logger.error(f"Error predicting spend forecast: {str(e)}")
+            return 0.0
+
+    def get_budget_trends(self, time_period: int = 30) -> List[float]:
+        """
+        Get real budget utilization trends from actual spending data.
+        
+        Args:
+            time_period: Number of days to analyze
+            
+        Returns:
+            List of budget utilization percentages over time
+        """
+        try:
+            # Get actual spending data from integrated platforms
+            spending_data = self._get_historical_spending_data(time_period)
+            budget_data = self._get_budget_allocation_data(time_period)
+            
+            trends = []
+            for i, spend_entry in enumerate(spending_data):
+                spend_amount = spend_entry.get('total_spend', 0)
+                budget_amount = budget_data[i].get('allocated_budget', 0) if i < len(budget_data) else 0
+                
+                utilization_percentage = (spend_amount / budget_amount * 100) if budget_amount > 0 else 0
+                trends.append(round(utilization_percentage, 1))
+            
+            return trends
+            
+        except Exception as e:
+            logger.error(f"Error getting budget trends: {str(e)}")
+            return []
+
+    def generate_budget_recommendations(self, performance_data: Dict) -> List[Dict]:
+        """
+        Generate real budget recommendations based on actual performance data.
+        
+        Args:
+            performance_data: Real performance metrics from campaigns
+            
+        Returns:
+            List of actionable budget recommendations
+        """
+        try:
+            recommendations = []
+            
+            # Analyze ROI performance by channel
+            channel_roi = performance_data.get('channel_roi', {})
+            total_budget = performance_data.get('total_budget', 0)
+            
+            # Identify high-performing channels
+            high_performers = [
+                channel for channel, data in channel_roi.items()
+                if data.get('roi_percentage', 0) > 20  # 20% ROI threshold
+            ]
+            
+            # Identify underperforming channels
+            underperformers = [
+                channel for channel, data in channel_roi.items()
+                if data.get('roi_percentage', 0) < 5  # 5% ROI threshold
+            ]
+            
+            # Generate specific recommendations
+            if high_performers:
+                total_high_performer_budget = sum(
+                    channel_roi[channel].get('current_budget', 0) for channel in high_performers
+                )
+                recommendations.append({
+                    'type': 'budget_increase',
+                    'priority': 'high',
+                    'channels': high_performers,
+                    'current_budget': total_high_performer_budget,
+                    'recommended_increase': round(total_high_performer_budget * 0.25, 2),
+                    'expected_roi_increase': '15-25%',
+                    'reasoning': f'Increase budget for high-performing channels: {", ".join(high_performers)}'
+                })
+            
+            if underperformers:
+                total_underperformer_budget = sum(
+                    channel_roi[channel].get('current_budget', 0) for channel in underperformers
+                )
+                recommendations.append({
+                    'type': 'budget_reallocation',
+                    'priority': 'medium',
+                    'channels': underperformers,
+                    'current_budget': total_underperformer_budget,
+                    'recommended_reduction': round(total_underperformer_budget * 0.4, 2),
+                    'reallocation_target': high_performers[0] if high_performers else 'content_creation',
+                    'reasoning': f'Reallocate budget from underperforming channels: {", ".join(underperformers)}'
+                })
+            
+            # Analyze spending velocity
+            spending_velocity = performance_data.get('spending_velocity', 0)
+            if spending_velocity > 1.2:  # Spending 20% faster than planned
+                recommendations.append({
+                    'type': 'pace_adjustment',
+                    'priority': 'high',
+                    'current_pace': f'{spending_velocity:.1%} of planned',
+                    'recommended_action': 'reduce_daily_budgets',
+                    'adjustment_percentage': -15,
+                    'reasoning': 'Current spending pace is too aggressive; risk of budget exhaustion'
+                })
+            elif spending_velocity < 0.8:  # Spending 20% slower than planned
+                recommendations.append({
+                    'type': 'pace_adjustment',
+                    'priority': 'medium',
+                    'current_pace': f'{spending_velocity:.1%} of planned',
+                    'recommended_action': 'increase_daily_budgets',
+                    'adjustment_percentage': 10,
+                    'reasoning': 'Current spending pace is too conservative; missing growth opportunities'
+                })
+            
+            return recommendations
+            
+        except Exception as e:
+            logger.error(f"Error generating budget recommendations: {str(e)}")
+            return [] 

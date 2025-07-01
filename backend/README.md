@@ -56,6 +56,43 @@ python main.py
 
 The backend will start on `http://localhost:5000`
 
+## Package Management
+
+### Updated Requirements
+
+The project now uses more flexible version constraints to ensure compatibility while allowing for security updates:
+
+- **`requirements.txt`**: Full dependencies with flexible version ranges
+- **`requirements_core.txt`**: Minimal core dependencies for lightweight deployments
+
+### Dependency Update Tool
+
+Use the included utility script to safely manage package updates:
+
+```bash
+# Check for outdated packages (dry run)
+python update_packages.py
+
+# Actually update packages
+python update_packages.py --upgrade
+
+# Check for security vulnerabilities
+python update_packages.py --security
+```
+
+This tool provides:
+- Safe dependency checking before updating
+- Conflict detection and resolution
+- Security vulnerability scanning
+- Rollback support if updates fail
+
+### Key Dependencies
+
+- **Flask 3.0+**: Modern web framework with latest security features
+- **Firebase Admin SDK**: Latest stable version for database operations
+- **OpenAI Python SDK**: Flexible version to accommodate frequent API updates
+- **Google Cloud Firestore**: Latest version with improved performance
+
 ## API Endpoints
 
 ### Health Check

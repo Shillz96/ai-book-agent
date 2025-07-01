@@ -199,12 +199,12 @@ const Settings = ({
 
     try {
       // Save to Firebase (for immediate UI updates)
-      const { setDoc, doc, serverTimestamp } = await import('firebase/firestore');
+      const { setDoc, doc } = await import('firebase/firestore');
       const settingsRef = doc(firebaseServices.db, 'settings', userId);
       
       const settingsToSave = {
         ...settings,
-        lastUpdated: serverTimestamp()
+        lastUpdated: new Date().toISOString()
       };
 
       await setDoc(settingsRef, settingsToSave);
@@ -229,20 +229,34 @@ const Settings = ({
         }
 
         console.log('Configuration saved to backend:', result);
+        
+        // If we get here, both Firebase and backend saves succeeded
+        setSaveMessage('✅ Settings saved successfully! All systems synchronized.');
+        
       } catch (backendError) {
         console.error('Error saving to backend config API:', backendError);
-        // Don't fail the entire save operation, just log the error
-        setSaveMessage('⚠️ Settings saved to Firebase but backend config update failed. Some features may not work correctly.');
+        
+        // Provide specific guidance based on the error
+        let warningMessage = '⚠️ Settings saved to Firebase but backend sync failed.\n\n';
+        
+        if (backendError.message.includes('Firebase service not initialized')) {
+          warningMessage += '📋 Solution: The backend needs Firebase configuration:\n';
+          warningMessage += '1. Set GOOGLE_APPLICATION_CREDENTIALS environment variable\n';
+          warningMessage += '2. Or configure Firebase in backend/.env file\n';
+          warningMessage += '3. Restart the backend server\n\n';
+          warningMessage += 'Your settings are saved and the app will work, but some backend features may be limited.';
+        } else {
+          warningMessage += '📋 Your settings are still saved and working!\n';
+          warningMessage += 'This only affects backend configuration caching.\n\n';
+          warningMessage += 'To fix: Restart the backend server or check backend logs.';
+        }
+        
+        setSaveMessage(warningMessage);
       }
       
       // Call callback to notify parent component
       if (onSettingsUpdate) {
         onSettingsUpdate(settingsToSave);
-      }
-
-      // If we get here without backend errors, show success message
-      if (saveMessage === '') {
-        setSaveMessage('✅ Settings saved successfully! Backend configuration updated.');
       }
       
       // Clear message after 3 seconds

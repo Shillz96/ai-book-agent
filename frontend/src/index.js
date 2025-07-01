@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client';
 
 // Import the main App component
 import App from './App';
+import Navbar from './components/Navbar';
 
 // Import Tailwind CSS for styling
 import './index.css';
@@ -14,6 +15,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 // Render the App component with React.StrictMode for development checks
 root.render(
   <React.StrictMode>
+    <Navbar />
     <App />
   </React.StrictMode>
 ); 
